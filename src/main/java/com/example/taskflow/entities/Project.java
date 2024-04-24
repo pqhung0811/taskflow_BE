@@ -21,6 +21,9 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> members;
+    @ManyToOne
+    @JoinColumn(name = "manager_id")
+    private User projectManager;
 
     public int getId() {
         return id;
@@ -52,5 +55,13 @@ public class Project {
 
     public void setMembers(List<User> members) {
         this.members = members;
+    }
+
+    public User getProjectManager() {
+        return projectManager;
+    }
+
+    public void setProjectManager(User projectManager) {
+        this.projectManager = projectManager;
     }
 }
