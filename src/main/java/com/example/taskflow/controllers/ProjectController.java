@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLOutput;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +36,7 @@ public class ProjectController {
     private UserService userService;
 
     @GetMapping(path = "/projects", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Project>> getProjects() {
+    public ResponseEntity<Map<String, List<Project>>> getProjects() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -43,7 +44,9 @@ public class ProjectController {
         else {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
             List<Project> projects = projectService.getProjectsByUserId(customUserDetails.getUser().getId());
-            return ResponseEntity.status(HttpStatus.OK).body(projects);
+            Map<String, List<Project>> hashMap = new HashMap<>();
+            hashMap.put("projects", projects);
+            return ResponseEntity.status(HttpStatus.OK).body(hashMap);
         }
     }
 

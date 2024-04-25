@@ -57,7 +57,8 @@ public class UserController {
 
         // Trả về jwt cho người dùng.
         String jwt = tokenProvider.generateToken((CustomUserDetails) authentication.getPrincipal());
-        return new LoginResponse(jwt, loginRequest.getEmail(), loginRequest.getPassword());
+        int id = ((CustomUserDetails) authentication.getPrincipal()).getUser().getId();
+        return new LoginResponse(jwt, loginRequest.getEmail(), loginRequest.getPassword(), id);
     }
 
     @DeleteMapping(path = "/user/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

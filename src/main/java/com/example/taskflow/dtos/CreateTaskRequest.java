@@ -13,6 +13,7 @@ public class CreateTaskRequest {
     private int projectId;
     private String startTime;
     private String deadline;
+    private String description;
 
     public String getTitle() {
         return title;
@@ -60,5 +61,13 @@ public class CreateTaskRequest {
 
     public void setDeadline(String deadline) {
         this.deadline = deadline;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

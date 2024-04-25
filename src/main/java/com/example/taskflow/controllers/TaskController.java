@@ -22,9 +22,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -37,7 +35,7 @@ public class TaskController {
     private UserService userService;
 
     @GetMapping(path = "/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Task>> getTasks(){
+    public ResponseEntity<Map<String, List<Task>>> getTasks(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -45,20 +43,23 @@ public class TaskController {
         else {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             List<Task> tasks = taskService.getTasksByUserId(userDetails.getUser().getId());
-            return ResponseEntity.status(HttpStatus.OK).body(tasks);
+            Map<String, List<Task>> hasMap = new HashMap<>();
+            hasMap.put("tasks", tasks);
+            return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }
 
     @GetMapping(path = "/tasks/currentTask/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getTask(@PathVariable int id){
+    public ResponseEntity<Map<String, Task>> getTask(@PathVariable int id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         else {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            List<Task> tasks = taskService.getTasksByUserId(userDetails.getUser().getId());
-            return ResponseEntity.status(HttpStatus.OK).body(tasks);
+            Task task = taskService.getTaskById(id);
+            Map<String, Task> hasMap = new HashMap<>();
+            hasMap.put("task", task);
+            return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }
 
@@ -85,7 +86,8 @@ public class TaskController {
                         startTime,
                         deadline,
                         project,
-                        userDetails.getUser());
+                        userDetails.getUser(),
+                        createTaskRequest.getDescription());
                 taskService.createTask(task);
                 return ResponseEntity.status(HttpStatus.OK).body("Create task successfully");
             }
