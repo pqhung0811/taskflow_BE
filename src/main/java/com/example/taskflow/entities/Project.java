@@ -3,6 +3,7 @@ package com.example.taskflow.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -11,9 +12,10 @@ import java.util.List;
 @Table(name = "project")
 public class Project {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
-    private Date startDate;
+    private LocalDateTime startDate;
     @ManyToMany
     @JoinTable(
             name = "projectmember",
@@ -41,11 +43,11 @@ public class Project {
         this.name = name;
     }
 
-    public Date getStartDate() {
+    public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
     }
 

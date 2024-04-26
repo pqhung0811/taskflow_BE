@@ -10,6 +10,7 @@ import java.util.Date;
 @Table(name = "comment")
 public class Comment {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String content;
     private Date date;

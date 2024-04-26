@@ -14,12 +14,20 @@ import java.util.Optional;
 public interface ImageDataRepository extends JpaRepository<ImageData, Integer> {
     public List<ImageData> findByUser(User user);
     @Transactional
-
     default void updateImageData(int id, byte[] newImageData) {
         ImageData imageData = findById(id).orElse(null);
         if (imageData != null) {
             imageData.setImageData(newImageData);
             save(imageData); // Hoặc có thể sử dụng saveAndFlush(imageData);
         }
+    }
+    @Transactional
+    default void saveNewImageData(User user, byte[] newImageData) {
+        ImageData imageData = new ImageData();
+        imageData.setImageData(newImageData);
+        imageData.setUser(user);
+        imageData.setName("aaaa");
+        imageData.setType("aaaa");
+        save(imageData);
     }
 }

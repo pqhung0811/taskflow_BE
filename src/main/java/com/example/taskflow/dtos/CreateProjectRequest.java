@@ -6,22 +6,31 @@ import java.util.Date;
 
 @Data
 public class CreateProjectRequest {
-    private String name;
-    private Date startDate;
+    private String title;
+    private int projectManageId;
+//    private Date startDate;
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Date getStartDate() {
-        return startDate;
+//    public Date getStartDate() {
+//        return startDate;
+//    }
+//
+//    public void setStartDate(Date startDate) {
+//        this.startDate = startDate;
+//    }
+
+    public int getProjectManageId() {
+        return projectManageId;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setProjectManageId(int projectManageId) {
+        this.projectManageId = projectManageId;
     }
 }

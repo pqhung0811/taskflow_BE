@@ -25,7 +25,7 @@ public class AvatarController {
     @PostMapping("/image/{userId}")
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file, @PathVariable("userId") int userId) throws IOException {
         User user= userService.getUserById(userId);
-        String response= imageDataService.uploadImage(file,user);
+        String response= imageDataService.uploadImage(file, user);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(response);
     }

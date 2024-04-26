@@ -6,6 +6,8 @@ import com.example.taskflow.reponsitories.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +28,14 @@ public class ProjectService {
     }
     public void addMemberToProject(User user, Project project) {
         projectRepository.addMemberToProject(project.getId(), user.getId());
+        List<User> members = project.getMembers();
+        if (members == null) {
+            members = new ArrayList<>();
+            members.add(user);
+            project.setMembers(members);
+        }
+        else {
+        }
     }
     public boolean checkMemberInProject(User user, Project project) {
         List<User> usersInProject = project.getMembers();
@@ -39,10 +49,13 @@ public class ProjectService {
     public void deleteProject(int projectId) {
         projectRepository.deleteById(projectId);
     }
-    public void createProject(String name, Date startDate) {
+    public Project createProject(String name, LocalDateTime startDate, User user) {
         Project project = new Project();
         project.setName(name);
         project.setStartDate(startDate);
+        project.setProjectManager(user);
         projectRepository.save(project);
+        addMemberToProject(user, project);
+        return project;
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLOutput;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,26 +52,30 @@ public class ProjectController {
     }
 
     @GetMapping(path = "/projects/{id}/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Task>> getTasks(@PathVariable int id) {
+    public ResponseEntity<Map<String, List<Task>>> getTasks(@PathVariable int id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         else {
             List<Task> tasks = taskService.getTasksByProjectId(id);
-            return ResponseEntity.status(HttpStatus.OK).body(tasks);
+            Map<String, List<Task>> hasMap = new HashMap<>();
+            hasMap.put("tasks", tasks);
+            return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }
 
     @GetMapping(path = "/projects/{projectId}/members", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<User>> getMembers(@PathVariable int projectId) {
+    public ResponseEntity<Map<String, List<User>>> getMembers(@PathVariable int projectId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         else {
             List<User> users = projectService.getUserByProjectId(projectId);
-            return ResponseEntity.status(HttpStatus.OK).body(users);
+            Map<String, List<User>> hasMap = new HashMap<>();
+            hasMap.put("members", users);
+            return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }
 
@@ -98,15 +103,20 @@ public class ProjectController {
         }
     }
 
-    @PostMapping(path = "projects/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createProject(@RequestBody CreateProjectRequest createProjectRequest) {
+    @PostMapping(path = "/projects/create", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Project>> createProject(@RequestBody CreateProjectRequest createProjectRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         else {
-            projectService.createProject(createProjectRequest.getName(), createProjectRequest.getStartDate());
-            return ResponseEntity.status((HttpStatus.OK)).body("Add project successfully");
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            LocalDateTime startDate = LocalDateTime.now();
+            System.out.println("lmao create prj: " + customUserDetails.getUser().getEmail());
+            Project project = projectService.createProject(createProjectRequest.getTitle(), startDate, customUserDetails.getUser());
+            Map<String, Project> hasMap = new HashMap<>();
+            hasMap.put("project", project);
+            return ResponseEntity.status((HttpStatus.OK)).body(hasMap);
         }
     }
 
