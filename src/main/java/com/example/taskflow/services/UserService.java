@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,8 +19,13 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-    public void addUser(User user) {
+    public User addUser(String email, String name, String password) {
+        User user = new User();
+        user.setEmail(email);
+        user.setName(name);
+        user.setPassword(password);
         userRepository.save(user);
+        return user;
     }
 
     public List<User> getUsers() {
@@ -47,5 +53,13 @@ public class UserService implements UserDetailsService {
     public User getUserById(int id) {
         Optional<User> userOptional = userRepository.findById(id);
         return userOptional.orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    public boolean checkExistEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public void updateNameById(String name, int userId) {
+        userRepository.updateNameById(name, userId);
     }
 }

@@ -52,7 +52,7 @@ public class ProjectController {
     }
 
     @GetMapping(path = "/projects/{id}/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, List<Task>>> getTasks(@PathVariable int id) {
+    public ResponseEntity<?> getTasks(@PathVariable int id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);

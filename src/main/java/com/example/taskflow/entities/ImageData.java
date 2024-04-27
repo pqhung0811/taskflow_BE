@@ -3,7 +3,7 @@ package com.example.taskflow.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "imagedata")
+@Table(name = "image_data")
 public class ImageData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -25,6 +25,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserService userService;
 
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
+
      @Bean
      public JwtAuthenticationFilter jwtAuthenticationFilter() {
      return new JwtAuthenticationFilter();
@@ -67,7 +70,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("*")); // Cho phép tất cả các domain
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE")); // Cho phép các phương thức HTTP
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH")); // Cho phép các phương thức HTTP
         configuration.setAllowedHeaders(Arrays.asList("*")); // Cho phép tất cả các loại header
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

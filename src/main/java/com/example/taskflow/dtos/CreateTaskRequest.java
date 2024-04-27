@@ -11,7 +11,7 @@ public class CreateTaskRequest {
     private int advance;
     private String email;
     private int projectId;
-    private String startTime;
+//    private String startTime;
     private String deadline;
     private String description;
 
@@ -47,13 +47,13 @@ public class CreateTaskRequest {
         this.projectId = projectId;
     }
 
-    public String getStartTime() {
-        return startTime;
-    }
+//    public String getStartTime() {
+//        return startTime;
+//    }
 
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
+//    public void setStartTime(String startTime) {
+//        this.startTime = startTime;
+//    }
 
     public String getDeadline() {
         return deadline;
