@@ -1,5 +1,6 @@
 package com.example.taskflow.services;
 
+import com.example.taskflow.entities.Comment;
 import com.example.taskflow.entities.EnumState;
 import com.example.taskflow.entities.Task;
 import com.example.taskflow.reponsitories.TaskRepository;
@@ -10,6 +11,7 @@ import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +21,8 @@ public class TaskService {
     private TaskRepository taskRepository;
 
     public List<Task> getTasksByProjectId(int projectId) {
-        return taskRepository.findByProjectId(projectId);
+        List<Task> tasks = taskRepository.findByProjectId(projectId);
+        return tasks;
     }
 
     public List<Task> getTasksByUserId(int userId) {
@@ -33,7 +36,10 @@ public class TaskService {
 
     public Task getTaskById(int id) {
         Optional<Task> optionalTask = taskRepository.findById(id);
+        List<Comment> comments = new ArrayList<>();
+        comments = taskRepository.findCommentByTaskId(id);
         Task task = optionalTask.get();
+        task.setComments(comments);
         return task;
     }
 

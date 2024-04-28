@@ -7,6 +7,8 @@ import com.example.taskflow.reponsitories.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class CommentService {
     @Autowired
@@ -17,6 +19,7 @@ public class CommentService {
         comment.setContent(text);
         comment.setUser(user);
         comment.setTask(task);
+        comment.setDate(LocalDateTime.now());
         commentRepository.save(comment);
         return comment;
     }

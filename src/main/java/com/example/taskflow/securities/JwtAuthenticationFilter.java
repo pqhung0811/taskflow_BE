@@ -37,16 +37,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Lấy jwt từ request
             String jwt = getJwtFromRequest(request);
 
-            System.out.println(jwt);
-            System.out.println(tokenProvider.validateToken(jwt));
-
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 // Lấy id user từ chuỗi jwt
                 Long userIdLong = tokenProvider.getUserIdFromJWT(jwt);
                 int userId = userIdLong != null ? userIdLong.intValue() : 0;
                 // Lấy thông tin người dùng từ id
                 UserDetails userDetails = customUserDetailsService.loadUserById(userId);
-                System.out.println("userDetails " + userDetails.getUsername());
                 if(userDetails != null) {
                     // Nếu người dùng hợp lệ, set thông tin cho Seturity Context
                     UsernamePasswordAuthenticationToken

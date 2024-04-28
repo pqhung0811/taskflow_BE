@@ -11,6 +11,6 @@ public class Breakpoint {
     private int id;
     private Date date;
     @ManyToOne
-    @JoinColumn(name = "taskId") // Tên cột khóa ngoại trỏ tới Task
+    @JoinColumn(name = "task_id") // Tên cột khóa ngoại trỏ tới Task
     private Task task;
 }

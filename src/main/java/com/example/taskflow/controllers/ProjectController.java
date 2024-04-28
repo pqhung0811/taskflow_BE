@@ -1,7 +1,6 @@
 package com.example.taskflow.controllers;
 
-import com.example.taskflow.dtos.CreateProjectRequest;
-import com.example.taskflow.dtos.JoinMemberRequest;
+import com.example.taskflow.dtos.*;
 import com.example.taskflow.entities.Project;
 import com.example.taskflow.entities.Task;
 import com.example.taskflow.entities.User;
@@ -21,10 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLOutput;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -37,7 +33,7 @@ public class ProjectController {
     private UserService userService;
 
     @GetMapping(path = "/projects", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, List<Project>>> getProjects() {
+    public ResponseEntity<?> getProjects() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -45,8 +41,13 @@ public class ProjectController {
         else {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
             List<Project> projects = projectService.getProjectsByUserId(customUserDetails.getUser().getId());
-            Map<String, List<Project>> hashMap = new HashMap<>();
-            hashMap.put("projects", projects);
+            List<ProjectDto> projectDtos = new ArrayList<>();
+            for (Project p : projects) {
+                ProjectDto projectDto = new ProjectDto(p);
+                projectDtos.add(projectDto);
+            }
+            Map<String, List<ProjectDto>> hashMap = new HashMap<>();
+            hashMap.put("projects", projectDtos);
             return ResponseEntity.status(HttpStatus.OK).body(hashMap);
         }
     }
@@ -59,8 +60,13 @@ public class ProjectController {
         }
         else {
             List<Task> tasks = taskService.getTasksByProjectId(id);
-            Map<String, List<Task>> hasMap = new HashMap<>();
-            hasMap.put("tasks", tasks);
+            List<ProjectsTaskDto> projectsTaskDtos = new ArrayList<>();
+            for (Task t : tasks) {
+                ProjectsTaskDto projectsTaskDto = new ProjectsTaskDto(t);
+                projectsTaskDtos.add(projectsTaskDto);
+            }
+            Map<String, List<ProjectsTaskDto>> hasMap = new HashMap<>();
+            hasMap.put("tasks", projectsTaskDtos);
             return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }

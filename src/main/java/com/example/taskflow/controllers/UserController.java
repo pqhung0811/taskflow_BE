@@ -92,7 +92,6 @@ public class UserController {
 
             return ResponseEntity.status(HttpStatus.OK).body(user);
         }
-
     }
 
     @DeleteMapping(path = "/user/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

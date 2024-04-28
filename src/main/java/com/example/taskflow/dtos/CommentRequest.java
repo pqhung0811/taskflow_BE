@@ -7,6 +7,7 @@ public class CommentRequest {
     private int taskId;
     private int authorId;
     private String text;
+    private String date;
 
     public int getTaskId() {
         return taskId;

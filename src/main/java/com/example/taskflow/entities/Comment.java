@@ -3,6 +3,7 @@ package com.example.taskflow.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -13,11 +14,11 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String content;
-    private Date date;
+    private LocalDateTime date;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     private User user;
     @ManyToOne
-    @JoinColumn(name = "task_id") // Tên cột khóa ngoại trỏ tới Task
+    @JoinColumn(name = "task_id")
     private Task task;
 }

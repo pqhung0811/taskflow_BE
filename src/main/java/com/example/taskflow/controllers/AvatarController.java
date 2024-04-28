@@ -2,12 +2,15 @@ package com.example.taskflow.controllers;
 
 import com.example.taskflow.entities.ImageData;
 import com.example.taskflow.entities.User;
+import com.example.taskflow.services.CustomUserDetails;
 import com.example.taskflow.services.ImageDataService;
 import com.example.taskflow.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,15 +25,21 @@ public class AvatarController {
     @Autowired
     private ImageDataService imageDataService;
 
-    @PostMapping("/image/{userId}")
-    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file, @PathVariable("userId") int userId) throws IOException {
-        User user= userService.getUserById(userId);
-        String response= imageDataService.uploadImage(file, user);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(response);
+    @PostMapping(path = "/image", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        else {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String response = imageDataService.uploadImage(file, userDetails.getUser());
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(response);
+        }
     }
 
-    @GetMapping(path = "/image/info/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/image/info/{userId}")
     public void getImageInfoByUserId(@PathVariable("userId") int userId, HttpServletResponse response) {
         User user = userService.getUserById(userId);
         ImageData imageData = imageDataService.getImageByUser(user);
@@ -38,8 +47,9 @@ public class AvatarController {
         response.setContentType("image/jpeg");
         response.setHeader("Content-Length", String.valueOf(imageData.getImageData().length));
 
+        byte[] image = imageData.getImageData();
         try {
-            response.getOutputStream().write(imageData.getImageData());
+            response.getOutputStream().write(image);
             response.getOutputStream().flush();
         } catch (IOException e) {
             e.printStackTrace();

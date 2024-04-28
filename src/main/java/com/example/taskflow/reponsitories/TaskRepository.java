@@ -1,5 +1,6 @@
 package com.example.taskflow.reponsitories;
 
+import com.example.taskflow.entities.Comment;
 import com.example.taskflow.entities.EnumState;
 import com.example.taskflow.entities.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +17,7 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Query("SELECT t FROM Task t WHERE t.project.id = :projectId")
     public List<Task> findByProjectId(@Param("projectId") int projectId);
-    @Query("SELECT t FROM Task t WHERE t.responsible.id = :userId")
+    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.comments c WHERE t.responsible.id = :userId")
     public List<Task> findByUserId(@Param("userId") int userId);
     @Transactional
     @Modifying
@@ -38,4 +39,6 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Modifying
     @Query("UPDATE Task t SET t.state = :newState WHERE t.id = :taskId")
     public int updateStateById(int taskId, EnumState newState);
+    @Query("SELECT c FROM Comment c WHERE c.task.id = :taskId")
+    public List<Comment> findCommentByTaskId(int taskId);
 }

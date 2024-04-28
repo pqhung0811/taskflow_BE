@@ -27,7 +27,7 @@ public class Task {
     @JoinColumn(name = "project_id")
     private Project project;
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-    private List<Comment> comments = new ArrayList<Comment>();
+    private List<Comment> comments;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User responsible;

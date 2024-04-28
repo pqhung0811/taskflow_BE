@@ -36,7 +36,7 @@ public class TaskController {
     private CommentService commentService;
 
     @GetMapping(path = "/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, List<Task>>> getTasks(){
+    public ResponseEntity<?> getTasks(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -44,23 +44,28 @@ public class TaskController {
         else {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             List<Task> tasks = taskService.getTasksByUserId(userDetails.getUser().getId());
-            Map<String, List<Task>> hasMap = new HashMap<>();
-            hasMap.put("tasks", tasks);
+            List<TaskDto> taskDtos = new ArrayList<>();
+            for (Task t : tasks) {
+                TaskDto taskDto = new TaskDto(t);
+                taskDtos.add(taskDto);
+            }
+            Map<String, List<TaskDto>> hasMap = new HashMap<>();
+            hasMap.put("tasks", taskDtos);
             return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }
 
     @GetMapping(path = "/tasks/currentTask/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Task>> getTask(@PathVariable int id){
+    public ResponseEntity<?> getTask(@PathVariable int id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         else {
             Task task = taskService.getTaskById(id);
-            System.out.println("task controller current task: " + task.getComments().size());
-            Map<String, Task> hasMap = new HashMap<>();
-            hasMap.put("task", task);
+            TaskDto taskDto = new TaskDto(task);
+            Map<String, TaskDto> hasMap = new HashMap<>();
+            hasMap.put("task", taskDto);
             return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }
@@ -185,8 +190,9 @@ public class TaskController {
             Task task = taskService.getTaskById(commentRequest.getTaskId());
             Comment comment = commentService.createComment(user, commentRequest.getText(), task);
             task.addComment(comment);
-            Map<String, Task> response = new HashMap<>();
-            response.put("task", task);
+            Map<String, TaskDto> response = new HashMap<>();
+            TaskDto taskDto = new TaskDto(task);
+            response.put("task", taskDto);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
