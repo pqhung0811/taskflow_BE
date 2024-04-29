@@ -1,5 +1,7 @@
 package com.example.taskflow.entities;
 
+import lombok.Builder;
+
 import javax.persistence.*;
 
 @Entity

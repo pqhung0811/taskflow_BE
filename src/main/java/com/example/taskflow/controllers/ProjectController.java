@@ -72,15 +72,20 @@ public class ProjectController {
     }
 
     @GetMapping(path = "/projects/{projectId}/members", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, List<User>>> getMembers(@PathVariable int projectId) {
+    public ResponseEntity<?> getMembers(@PathVariable int projectId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         else {
             List<User> users = projectService.getUserByProjectId(projectId);
-            Map<String, List<User>> hasMap = new HashMap<>();
-            hasMap.put("members", users);
+            Map<String, List<UserDto>> hasMap = new HashMap<>();
+            List<UserDto> userDtos = new ArrayList<>();
+            for (User u : users) {
+                UserDto userDto = new UserDto(u);
+                userDtos.add(userDto);
+            }
+            hasMap.put("members", userDtos);
             return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }

@@ -27,12 +27,14 @@ public class ImageDataService {
     public String uploadImage(MultipartFile file, User user) throws IOException {
         List<ImageData> images = imageDataRepository.findByUser(user);
         if (images.size() == 0) {
-            imageDataRepository.saveNewImageData(user, ImageUtil.compressImage(file.getBytes()));
+//            imageDataRepository.saveNewImageData(user, ImageUtil.compressImage(file.getBytes()));
+            imageDataRepository.saveNewImageData(user, file.getBytes());
             return ("Image created successfully" );
         }
         else {
             ImageData image = images.get(0);
-            imageDataRepository.updateImageData(image.getId(), ImageUtil.compressImage(file.getBytes()));
+//            imageDataRepository.updateImageData(image.getId(), ImageUtil.compressImage(file.getBytes()));
+            imageDataRepository.updateImageData(image.getId(), file.getBytes());
             return ("Image uploaded successfully" );
         }
     }

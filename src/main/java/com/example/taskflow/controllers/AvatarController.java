@@ -5,7 +5,9 @@ import com.example.taskflow.entities.User;
 import com.example.taskflow.services.CustomUserDetails;
 import com.example.taskflow.services.ImageDataService;
 import com.example.taskflow.services.UserService;
+import com.example.taskflow.utils.ImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,7 @@ public class AvatarController {
     @Autowired
     private ImageDataService imageDataService;
 
-    @PostMapping(path = "/image", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/image")
     public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
@@ -43,11 +45,10 @@ public class AvatarController {
     public void getImageInfoByUserId(@PathVariable("userId") int userId, HttpServletResponse response) {
         User user = userService.getUserById(userId);
         ImageData imageData = imageDataService.getImageByUser(user);
+        byte[] image = imageData.getImageData();
 
         response.setContentType("image/jpeg");
         response.setHeader("Content-Length", String.valueOf(imageData.getImageData().length));
-
-        byte[] image = imageData.getImageData();
         try {
             response.getOutputStream().write(image);
             response.getOutputStream().flush();

@@ -1,5 +1,6 @@
 package com.example.taskflow.dtos;
 
+import com.example.taskflow.entities.User;
 import lombok.Data;
 
 @Data
@@ -10,6 +11,12 @@ public class UserDto {
 
     public UserDto() {
 
+    }
+
+    public UserDto(User user) {
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.name = user.getName();
     }
 
     public UserDto(int id, String name, String email) {

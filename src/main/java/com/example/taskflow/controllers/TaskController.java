@@ -172,8 +172,9 @@ public class TaskController {
         }
         else {
             Task task = taskService.updateState(modifyStateTaskRequest.getTaskId(), modifyStateTaskRequest.getNewState());
-            Map<String, Task> hasMap = new HashMap<>();
-            hasMap.put("task", task);
+            ProjectsTaskDto projectsTaskDto = new ProjectsTaskDto(task);
+            Map<String, ProjectsTaskDto> hasMap = new HashMap<>();
+            hasMap.put("task", projectsTaskDto);
             return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }
