@@ -91,7 +91,7 @@ public class ProjectController {
     }
 
     @PostMapping(path = "/projects/joinMember", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> addMemberToProject(@RequestBody JoinMemberRequest joinMemberRequest) {
+    public ResponseEntity<?> addMemberToProject(@RequestBody JoinMemberRequest joinMemberRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -106,7 +106,10 @@ public class ProjectController {
                     return ResponseEntity.status(HttpStatus.CONFLICT).body("User is available in project");
                 }
                 projectService.addMemberToProject(user, project);
-                return ResponseEntity.status((HttpStatus.OK)).body("Add member successfully");
+                UserDto userDto = new UserDto(user);
+                Map<String, UserDto> hasMap = new HashMap<>();
+                hasMap.put("member", userDto);
+                return ResponseEntity.status((HttpStatus.OK)).body(hasMap);
             }
             catch (UsernameNotFoundException e) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body("User is not found");

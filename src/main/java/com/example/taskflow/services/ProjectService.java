@@ -26,16 +26,18 @@ public class ProjectService {
     public Optional<Project> getProjectById(int projectId) {
         return projectRepository.findById(projectId);
     }
-    public void addMemberToProject(User user, Project project) {
+    public Project addMemberToProject(User user, Project project) {
         projectRepository.addMemberToProject(project.getId(), user.getId());
-        List<User> members = project.getMembers();
-        if (members == null) {
-            members = new ArrayList<>();
-            members.add(user);
-            project.setMembers(members);
-        }
-        else {
-        }
+        project.addMember(user);
+        return project;
+//        List<User> members = project.getMembers();
+//        if (members == null) {
+//            members = new ArrayList<>();
+//            members.add(user);
+//            project.setMembers(members);
+//        }
+//        else {
+//        }
     }
     public boolean checkMemberInProject(User user, Project project) {
         List<User> usersInProject = project.getMembers();

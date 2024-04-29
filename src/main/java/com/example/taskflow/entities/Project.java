@@ -27,6 +27,10 @@ public class Project {
     @JoinColumn(name = "manager_id")
     private User projectManager;
 
+    public void addMember(User user) {
+        this.members.add(user);
+    }
+
     public int getId() {
         return id;
     }
