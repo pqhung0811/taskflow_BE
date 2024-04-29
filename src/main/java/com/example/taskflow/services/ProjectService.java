@@ -30,14 +30,6 @@ public class ProjectService {
         projectRepository.addMemberToProject(project.getId(), user.getId());
         project.addMember(user);
         return project;
-//        List<User> members = project.getMembers();
-//        if (members == null) {
-//            members = new ArrayList<>();
-//            members.add(user);
-//            project.setMembers(members);
-//        }
-//        else {
-//        }
     }
     public boolean checkMemberInProject(User user, Project project) {
         List<User> usersInProject = project.getMembers();
