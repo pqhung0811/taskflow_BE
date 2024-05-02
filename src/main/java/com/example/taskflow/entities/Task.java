@@ -31,6 +31,8 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User responsible;
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    private List<FileAttachment> fileAttachments = new ArrayList<FileAttachment>();
 
     public Task() {
     }

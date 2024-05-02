@@ -6,6 +6,7 @@ import com.example.taskflow.reponsitories.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,6 +42,7 @@ public class ProjectService {
         return true;
     }
     public void deleteProject(int projectId) {
+        projectRepository.deleteAllMemberProject(projectId);
         projectRepository.deleteById(projectId);
     }
     public Project createProject(String name, LocalDateTime startDate, User user) {

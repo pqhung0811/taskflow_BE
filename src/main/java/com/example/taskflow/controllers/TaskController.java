@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -34,14 +35,15 @@ public class TaskController {
     private UserService userService;
     @Autowired
     private CommentService commentService;
+    @Autowired
+    private FileAttachmentService fileAttachmentService;
 
     @GetMapping(path = "/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTasks(){
+    public ResponseEntity<?> getTasks() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        else {
+        } else {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             List<Task> tasks = taskService.getTasksByUserId(userDetails.getUser().getId());
             List<TaskDto> taskDtos = new ArrayList<>();
@@ -56,12 +58,11 @@ public class TaskController {
     }
 
     @GetMapping(path = "/tasks/currentTask/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getTask(@PathVariable int id){
+    public ResponseEntity<?> getTask(@PathVariable int id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        else {
+        } else {
             Task task = taskService.getTaskById(id);
             TaskDto taskDto = new TaskDto(task);
             Map<String, TaskDto> hasMap = new HashMap<>();
@@ -75,14 +76,13 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        else {
+        } else {
             try {
                 Map<String, Task> hashMap = new HashMap<>();
                 CustomUserDetails userDetails = (CustomUserDetails) userService.loadUserByUsername(createTaskRequest.getEmail());
                 Optional<Project> projectOptional = projectService.getProjectById(createTaskRequest.getProjectId());
                 if (!projectOptional.isPresent()) {
-                    return ResponseEntity.status(HttpStatus.CONFLICT).body("project is not exist");
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("project is not exist");
                 }
 //                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -101,9 +101,8 @@ public class TaskController {
                 hashMap.put("task", task);
 
                 return ResponseEntity.status(HttpStatus.OK).body(hashMap);
-            }
-            catch (UsernameNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("user is not exist");
+            } catch (UsernameNotFoundException e) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("user is not exist");
             }
         }
     }
@@ -113,8 +112,7 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        else {
+        } else {
             Task task = taskService.updateTitle(modifyTitleTaskRequest.getTaskId(), modifyTitleTaskRequest.getNewTitle());
             Map<String, Task> hasMap = new HashMap<>();
             hasMap.put("task", task);
@@ -127,8 +125,7 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        else {
+        } else {
             Task task = taskService.updateDescription(modifyDescriptionTaskRequest.getTaskId(), modifyDescriptionTaskRequest.getNewDescription());
             Map<String, Task> hasMap = new HashMap<>();
             hasMap.put("task", task);
@@ -141,8 +138,7 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        else {
+        } else {
             Task task = taskService.updateAdvance(modifyAdvanceTaskRequest.getTaskId(), modifyAdvanceTaskRequest.getNewAdvance());
             Map<String, Task> hasMap = new HashMap<>();
             hasMap.put("task", task);
@@ -155,8 +151,7 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        else {
+        } else {
             Task task = taskService.updateDeadline(modifyDeadlineTaskRequest.getTaskId(), modifyDeadlineTaskRequest.getNewDeadline());
             Map<String, Task> hasMap = new HashMap<>();
             hasMap.put("task", task);
@@ -169,8 +164,7 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        else {
+        } else {
             Task task = taskService.updateState(modifyStateTaskRequest.getTaskId(), modifyStateTaskRequest.getNewState());
             ProjectsTaskDto projectsTaskDto = new ProjectsTaskDto(task);
             Map<String, ProjectsTaskDto> hasMap = new HashMap<>();
@@ -184,8 +178,7 @@ public class TaskController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        else {
+        } else {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = userDetails.getUser();
             Task task = taskService.getTaskById(commentRequest.getTaskId());
@@ -198,4 +191,21 @@ public class TaskController {
         }
     }
 
+    @PostMapping(path = "/tasks/{id}/addFile")
+    public ResponseEntity<?> addFileAttachment(@RequestParam("file") MultipartFile file, @PathVariable("id") int id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            if (file == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("no file");
+            }
+            Task task = taskService.getTaskById(id);
+            if (task == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("no task found");
+            }
+            fileAttachmentService.saveFile(file, task);
+            return ResponseEntity.status(HttpStatus.OK).body("success");
+        }
+    }
 }

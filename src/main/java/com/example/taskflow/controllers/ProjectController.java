@@ -112,7 +112,7 @@ public class ProjectController {
                 return ResponseEntity.status((HttpStatus.OK)).body(hasMap);
             }
             catch (UsernameNotFoundException e) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("User is not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User is not found");
             }
         }
     }
@@ -134,14 +134,14 @@ public class ProjectController {
         }
     }
 
-//    @DeleteMapping(path = "/projects/{projectId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity deleteProject(@PathVariable int projectId) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-//        }
-//        projectService.deleteProject(projectId);
-//        return ResponseEntity.status((HttpStatus.OK)).body("Delete project successfully");
-//    }
+    @DeleteMapping(path = "/projects/{projectId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity deleteProject(@PathVariable int projectId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        projectService.deleteProject(projectId);
+        return ResponseEntity.status((HttpStatus.OK)).body("Delete project successfully");
+    }
 
 }

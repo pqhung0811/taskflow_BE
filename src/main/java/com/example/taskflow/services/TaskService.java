@@ -2,6 +2,7 @@ package com.example.taskflow.services;
 
 import com.example.taskflow.entities.Comment;
 import com.example.taskflow.entities.EnumState;
+import com.example.taskflow.entities.FileAttachment;
 import com.example.taskflow.entities.Task;
 import com.example.taskflow.reponsitories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +37,18 @@ public class TaskService {
 
     public Task getTaskById(int id) {
         Optional<Task> optionalTask = taskRepository.findById(id);
-        List<Comment> comments = new ArrayList<>();
+        List<Comment> comments;
         comments = taskRepository.findCommentByTaskId(id);
-        Task task = optionalTask.get();
-        task.setComments(comments);
-        return task;
+        List<FileAttachment> fileAttachments;
+        fileAttachments = taskRepository.findFileByTaskId(id);
+        if (optionalTask.isPresent()) {
+            Task task = optionalTask.get();
+            task.setComments(comments);
+            task.setFileAttachments(fileAttachments);
+            return task;
+        } else {
+            return null;
+        }
     }
 
     public Task updateTitle(int taskId, String title) {
@@ -62,8 +70,6 @@ public class TaskService {
     }
 
     public Task updateDeadline(int taskId, String deadline) {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-//        LocalDateTime deadlineTime = LocalDateTime.parse(deadline, formatter);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate deadlineDate = LocalDate.parse(deadline, formatter);
         LocalDateTime deadlineTime = deadlineDate.atStartOfDay();
