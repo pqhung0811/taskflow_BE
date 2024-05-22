@@ -3,6 +3,7 @@ package com.example.taskflow.services;
 import com.example.taskflow.entities.FileAttachment;
 import com.example.taskflow.entities.Task;
 import com.example.taskflow.reponsitories.FileAttachmentRepository;
+import com.example.taskflow.reponsitories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -21,8 +23,10 @@ import java.util.Optional;
 public class FileAttachmentService {
     @Autowired
     private FileAttachmentRepository fileAttachmentRepository;
+    @Autowired
+    private TaskRepository taskRepository;
 
-    public String saveFile(MultipartFile file, Task task) {
+    public FileAttachment saveFile(MultipartFile file, Task task) {
         String fileName = file.getOriginalFilename();
         String directoryPath = "D:/New folder/taskflow/file_folder/task" + task.getId() + "/";
         String filePath = directoryPath + fileName;
@@ -42,7 +46,7 @@ public class FileAttachmentService {
         fileAttachment.setTask(task);
         fileAttachmentRepository.save(fileAttachment);
 
-        return filePath;
+        return fileAttachment;
     }
 
     public Resource loadFileAsResource(String filePath) throws IOException {
@@ -71,5 +75,29 @@ public class FileAttachmentService {
             file.delete();
         }
         fileAttachmentRepository.delete(fileAttachment);
+    }
+
+    public void deleteDirectory(int taskId) {
+        String directoryPath = "D:/New folder/taskflow/file_folder/task" + taskId;
+        Path directory = Paths.get(directoryPath);
+
+        if (Files.exists(directory)) {
+            try {
+                Files.walk(directory)
+                        .sorted((a, b) -> -a.compareTo(b)) // Xác định thứ tự của thư mục và tệp để xóa thư mục trước
+                        .forEach(path -> {
+                            try {
+                                Files.deleteIfExists(path);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                System.out.println("Xóa thất bại: " + path.toString());
+                            }
+                        });
+                System.out.println("Thư mục đã được xóa thành công.");
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Xóa thư mục thất bại.");
+            }
+        }
     }
 }

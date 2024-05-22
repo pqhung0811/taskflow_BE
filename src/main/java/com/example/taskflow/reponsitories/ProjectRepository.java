@@ -19,10 +19,10 @@ public interface ProjectRepository extends JpaRepository<Project, Integer> {
     public List<User> getUserByProject(@Param("projectId") int projectId);
     @Transactional
     @Modifying
-    @Query(value = "INSERT INTO projectmember(project_id, user_id) VALUES (:projectId, :userId)", nativeQuery = true)
+    @Query(value = "INSERT INTO project_member(project_id, user_id) VALUES (:projectId, :userId)", nativeQuery = true)
     public void addMemberToProject(@Param("projectId") int projectId, @Param("userId") int userId);
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM projectmember where project_id = :projectId", nativeQuery = true)
+    @Query(value = "DELETE FROM project_member where project_id = :projectId", nativeQuery = true)
     public void deleteAllMemberProject(int projectId);
 }

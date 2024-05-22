@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -21,4 +22,9 @@ public class Comment {
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;
+//    @ManyToOne
+//    @JoinColumn(name = "parent_id")
+//    private Comment parent;
+//    @OneToMany(mappedBy = "parent")
+//    private List<Comment> replies;
 }

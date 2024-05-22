@@ -8,6 +8,7 @@ public class CommentRequest {
     private int authorId;
     private String text;
     private String date;
+    private int parentId;
 
     public int getTaskId() {
         return taskId;
@@ -31,5 +32,13 @@ public class CommentRequest {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public int getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
     }
 }

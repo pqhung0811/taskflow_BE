@@ -4,6 +4,7 @@ import com.example.taskflow.entities.Comment;
 import com.example.taskflow.entities.EnumState;
 import com.example.taskflow.entities.FileAttachment;
 import com.example.taskflow.entities.Task;
+import com.example.taskflow.reponsitories.CommentRepository;
 import com.example.taskflow.reponsitories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import java.util.Optional;
 public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
     public List<Task> getTasksByProjectId(int projectId) {
         List<Task> tasks = taskRepository.findByProjectId(projectId);
@@ -83,4 +86,19 @@ public class TaskService {
         Task task = getTaskById(taskId);
         return task;
     }
+
+    public void deleteTask(int id) {
+        taskRepository.deleteById(id);
+    }
+
+//    public void getCommentByParent(Comment comment) {
+//        List<Comment> comments = commentRepository.findCommentByParent(comment.getId());
+//        if (comments.size()==0) return;
+//        else {
+//            comment.setReplies(comments);
+//            for (Comment c : comments) {
+//                getCommentByParent(c);
+//            }
+//        }
+//    }
 }

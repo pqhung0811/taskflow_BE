@@ -18,7 +18,7 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Query("SELECT t FROM Task t WHERE t.project.id = :projectId")
     public List<Task> findByProjectId(@Param("projectId") int projectId);
-    @Query("SELECT t FROM Task t LEFT JOIN FETCH t.comments c WHERE t.responsible.id = :userId")
+    @Query("SELECT DISTINCT t FROM Task t LEFT JOIN FETCH t.comments c WHERE t.responsible.id = :userId")
     public List<Task> findByUserId(@Param("userId") int userId);
     @Transactional
     @Modifying

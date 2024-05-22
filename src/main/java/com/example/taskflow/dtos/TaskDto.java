@@ -20,7 +20,7 @@ public class TaskDto {
     private List<CommentDto> comments;
     private UserDto responsible;
     private ProjectDto project;
-    private List<FileAttachmentDto> fileAttachments;
+    private List<FileAttachmentDto> files;
 
     public TaskDto(Task task) {
         this.id = task.getId();
@@ -59,6 +59,6 @@ public class TaskDto {
             fileAttachmentDto.setFilename(f.getFileName());
             fileAttachmentDtos.add(fileAttachmentDto);
         }
-        this.fileAttachments = fileAttachmentDtos;
+        this.files = fileAttachmentDtos;
     }
 }

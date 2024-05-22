@@ -18,7 +18,7 @@ public class Project {
     private LocalDateTime startDate;
     @ManyToMany
     @JoinTable(
-            name = "projectmember",
+            name = "project_member",
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )

@@ -1,10 +1,7 @@
 package com.example.taskflow.controllers;
 
 import com.example.taskflow.dtos.*;
-import com.example.taskflow.entities.Comment;
-import com.example.taskflow.entities.Project;
-import com.example.taskflow.entities.Task;
-import com.example.taskflow.entities.User;
+import com.example.taskflow.entities.*;
 import com.example.taskflow.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -191,8 +188,8 @@ public class TaskController {
         }
     }
 
-    @PostMapping(path = "/tasks/{id}/addFile")
-    public ResponseEntity<?> addFileAttachment(@RequestParam("file") MultipartFile file, @PathVariable("id") int id) {
+    @PostMapping(path = "/tasks/addFile")
+    public ResponseEntity<?> addFileAttachment(@RequestParam("file") MultipartFile file, @RequestParam("id") int id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -204,8 +201,23 @@ public class TaskController {
             if (task == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("no task found");
             }
-            fileAttachmentService.saveFile(file, task);
-            return ResponseEntity.status(HttpStatus.OK).body("success");
+            FileAttachment fileAttachment = fileAttachmentService.saveFile(file, task);
+
+//            TaskDto taskDto = new TaskDto(taskService.getTaskById(task.getId()));
+            FileAttachmentDto fileAttachmentDto = new FileAttachmentDto(fileAttachment);
+            return ResponseEntity.status(HttpStatus.OK).body(fileAttachmentDto);
+        }
+    }
+
+    @DeleteMapping(path= "/tasks/delete/{id}")
+    public ResponseEntity<?> deleteTask(@PathVariable("id") int id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            taskService.deleteTask(id);
+            fileAttachmentService.deleteDirectory(id);
+            return ResponseEntity.status(HttpStatus.OK).body(id);
         }
     }
 }
