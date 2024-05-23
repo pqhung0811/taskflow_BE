@@ -1,9 +1,11 @@
 package com.example.taskflow.controllers;
 
 import com.example.taskflow.dtos.*;
+import com.example.taskflow.entities.Notifications;
 import com.example.taskflow.entities.User;
 import com.example.taskflow.securities.JwtTokenProvider;
 import com.example.taskflow.services.CustomUserDetails;
+import com.example.taskflow.services.NoificationsService;
 import com.example.taskflow.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,7 +19,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -25,15 +29,14 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
-
     @Autowired
     private AuthenticationManager authenticationManager;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
     @Autowired
     private JwtTokenProvider tokenProvider;
+    @Autowired
+    private NoificationsService noificationsService;
 
     @GetMapping(path = "/user/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getUserById(@PathVariable Integer id){
@@ -98,5 +101,24 @@ public class UserController {
     public void deleteUser(@PathVariable Integer id) {
         User user= userService.getUserById(id);
         userService.deleteUser(user);
+    }
+
+    @GetMapping(path = "/user/notify", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getNotifications() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        else {
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            User user = customUserDetails.getUser();
+            List<Notifications> notifications = noificationsService.getNotificationsByUserId(user.getId());
+            List<NotificationsDto> notificationsDtos = new ArrayList<>();
+            for (Notifications notifications1 : notifications) {
+                NotificationsDto notificationsDto = new NotificationsDto(notifications1);
+                notificationsDtos.add(notificationsDto);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(notificationsDtos);
+        }
     }
 }

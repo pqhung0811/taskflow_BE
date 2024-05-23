@@ -34,6 +34,8 @@ public class TaskController {
     private CommentService commentService;
     @Autowired
     private FileAttachmentService fileAttachmentService;
+    @Autowired
+    private NotificationController notificationController;
 
     @GetMapping(path = "/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getTasks() {
@@ -41,6 +43,8 @@ public class TaskController {
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } else {
+            System.out.println("lmao task controller : ");
+            notificationController.sendNotification("a");
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             List<Task> tasks = taskService.getTasksByUserId(userDetails.getUser().getId());
             List<TaskDto> taskDtos = new ArrayList<>();
