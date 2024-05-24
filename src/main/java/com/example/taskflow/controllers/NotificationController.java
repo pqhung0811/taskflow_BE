@@ -20,6 +20,7 @@ public class NotificationController {
     }
 
     public void sendNotification(String message) {
+        System.out.println("lmao code 1 " + message);
         messagingTemplate.convertAndSend("/topic/messages", message);
     }
 }

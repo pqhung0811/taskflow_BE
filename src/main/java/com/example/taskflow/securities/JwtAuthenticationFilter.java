@@ -4,6 +4,7 @@ import com.example.taskflow.services.CustomUserDetails;
 import com.example.taskflow.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +30,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        if ("Upgrade".equalsIgnoreCase(request.getHeader(HttpHeaders.CONNECTION))
+                && "websocket".equalsIgnoreCase(request.getHeader(HttpHeaders.UPGRADE))) {
+            // Bỏ qua xử lý cho yêu cầu WebSocket
+            filterChain.doFilter(request, response);
+            return;
+        }
         try {
             SecurityContextHolder.clearContext();
             System.out.println("Request URI: " + request.getRequestURI());

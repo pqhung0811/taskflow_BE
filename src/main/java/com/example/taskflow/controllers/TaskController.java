@@ -43,7 +43,6 @@ public class TaskController {
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } else {
-            System.out.println("lmao task controller : ");
             notificationController.sendNotification("a");
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             List<Task> tasks = taskService.getTasksByUserId(userDetails.getUser().getId());
