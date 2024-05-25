@@ -5,7 +5,7 @@ import com.example.taskflow.entities.Notifications;
 import com.example.taskflow.entities.User;
 import com.example.taskflow.securities.JwtTokenProvider;
 import com.example.taskflow.services.CustomUserDetails;
-import com.example.taskflow.services.NoificationsService;
+import com.example.taskflow.services.NotificationsService;
 import com.example.taskflow.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,7 +36,7 @@ public class UserController {
     @Autowired
     private JwtTokenProvider tokenProvider;
     @Autowired
-    private NoificationsService noificationsService;
+    private NotificationsService notificationsService;
 
     @GetMapping(path = "/user/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getUserById(@PathVariable Integer id){
@@ -112,13 +112,59 @@ public class UserController {
         else {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = customUserDetails.getUser();
-            List<Notifications> notifications = noificationsService.getNotificationsByUserId(user.getId());
+            List<Notifications> notifications = notificationsService.getNotificationsByUserId(user.getId());
             List<NotificationsDto> notificationsDtos = new ArrayList<>();
             for (Notifications notifications1 : notifications) {
                 NotificationsDto notificationsDto = new NotificationsDto(notifications1);
                 notificationsDtos.add(notificationsDto);
             }
             return ResponseEntity.status(HttpStatus.OK).body(notificationsDtos);
+        }
+    }
+
+    @GetMapping(path = "/user/noNotify", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getNumberOfNotifications() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        else {
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            User user = customUserDetails.getUser();
+            List<Notifications> notifications = notificationsService.getNotificationsByUserId(user.getId());
+            int noNotify = 0;
+            for (Notifications n : notifications) {
+                if (!n.isRead()) {
+                    noNotify++;
+                }
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(noNotify);
+        }
+    }
+
+    @PatchMapping(path = "/user/notifyState", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateStateNotify() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        else {
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            User user = customUserDetails.getUser();
+            notificationsService.markAllNotificationsAsReadByUserId(user.getId());
+            return ResponseEntity.status(HttpStatus.OK).body("success");
+        }
+    }
+
+    @DeleteMapping(path = "/user/notify/{noticeId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> deleteNotify(@PathVariable int noticeId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        else {
+            notificationsService.deleteNotification(noticeId);
+            return ResponseEntity.status(HttpStatus.OK).body("success");
         }
     }
 }

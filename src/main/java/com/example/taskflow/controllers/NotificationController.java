@@ -4,6 +4,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class NotificationController {
@@ -13,14 +14,15 @@ public class NotificationController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @MessageMapping("/message")
-    @SendTo("/topic/messages")
-    public String sendMessage(String message) {
+    @MessageMapping("/message/{id}")
+    @SendTo("/topic/messages/{id}")
+    public String sendMessage(@PathVariable int id, String message) {
+        System.out.println();
         return message;
     }
 
-    public void sendNotification(String message) {
+    public void sendNotification(int id, String message) {
         System.out.println("lmao code 1 " + message);
-        messagingTemplate.convertAndSend("/topic/messages", message);
+        messagingTemplate.convertAndSend("/topic/messages/" + id, message);
     }
 }

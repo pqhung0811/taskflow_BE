@@ -4,10 +4,7 @@ import com.example.taskflow.dtos.*;
 import com.example.taskflow.entities.Project;
 import com.example.taskflow.entities.Task;
 import com.example.taskflow.entities.User;
-import com.example.taskflow.services.CustomUserDetails;
-import com.example.taskflow.services.ProjectService;
-import com.example.taskflow.services.TaskService;
-import com.example.taskflow.services.UserService;
+import com.example.taskflow.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +28,10 @@ public class ProjectController {
     private TaskService taskService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private NotificationsService notificationsService;
+    @Autowired
+    private NotificationController notificationController;
 
     @GetMapping(path = "/projects", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getProjects() {
@@ -105,6 +106,9 @@ public class ProjectController {
                 if (!projectService.checkMemberInProject(user, project)) {
                     return ResponseEntity.status(HttpStatus.CONFLICT).body("User is available in project");
                 }
+                String textNotify = "You are added to new project (" + project.getName() + ")";
+                notificationsService.createNotification(user, textNotify);
+                notificationController.sendNotification(user.getId(), "a");
                 projectService.addMemberToProject(user, project);
                 UserDto userDto = new UserDto(user);
                 Map<String, UserDto> hasMap = new HashMap<>();
@@ -126,7 +130,6 @@ public class ProjectController {
         else {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
             LocalDateTime startDate = LocalDateTime.now();
-            System.out.println("lmao create prj: " + customUserDetails.getUser().getEmail());
             Project project = projectService.createProject(createProjectRequest.getTitle(), startDate, customUserDetails.getUser());
             Map<String, Project> hasMap = new HashMap<>();
             hasMap.put("project", project);

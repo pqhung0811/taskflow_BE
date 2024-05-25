@@ -35,6 +35,8 @@ public class TaskController {
     @Autowired
     private FileAttachmentService fileAttachmentService;
     @Autowired
+    private NotificationsService notificationsService;
+    @Autowired
     private NotificationController notificationController;
 
     @GetMapping(path = "/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,7 +45,6 @@ public class TaskController {
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } else {
-            notificationController.sendNotification("a");
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             List<Task> tasks = taskService.getTasksByUserId(userDetails.getUser().getId());
             List<TaskDto> taskDtos = new ArrayList<>();
@@ -84,12 +85,16 @@ public class TaskController {
                 if (!projectOptional.isPresent()) {
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).body("project is not exist");
                 }
-//                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                 LocalDateTime startTime = LocalDateTime.now();
                 LocalDateTime deadline = LocalDateTime.parse(createTaskRequest.getDeadline(), formatter);
                 Project project = projectOptional.get();
 
+                String textNotify = "You has been assignend to new task with title: " +
+                                        createTaskRequest.getTitle() +
+                                        ", deadline " + deadline;
+                notificationsService.createNotification(userDetails.getUser(), textNotify);
+                notificationController.sendNotification(userDetails.getUser().getId(), "a");
                 Task task = new Task(createTaskRequest.getTitle(),
                         createTaskRequest.getAdvance(),
                         startTime,
@@ -153,6 +158,10 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } else {
             Task task = taskService.updateDeadline(modifyDeadlineTaskRequest.getTaskId(), modifyDeadlineTaskRequest.getNewDeadline());
+            String textNotify = "Your task (" + task.getTitle() + ") was updated new deadline to "
+                                + modifyDeadlineTaskRequest.getNewDeadline();
+            notificationsService.createNotification(task.getResponsible(), textNotify);
+            notificationController.sendNotification(task.getResponsible().getId(), "a");
             Map<String, Task> hasMap = new HashMap<>();
             hasMap.put("task", task);
             return ResponseEntity.status(HttpStatus.OK).body(hasMap);
@@ -166,6 +175,9 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } else {
             Task task = taskService.updateState(modifyStateTaskRequest.getTaskId(), modifyStateTaskRequest.getNewState());
+            String textNotify = "Your task (" + task.getTitle() + ") was updated state";
+            notificationsService.createNotification(task.getResponsible(), textNotify);
+            notificationController.sendNotification(task.getResponsible().getId(), "a");
             ProjectsTaskDto projectsTaskDto = new ProjectsTaskDto(task);
             Map<String, ProjectsTaskDto> hasMap = new HashMap<>();
             hasMap.put("task", projectsTaskDto);
@@ -221,6 +233,17 @@ public class TaskController {
             taskService.deleteTask(id);
             fileAttachmentService.deleteDirectory(id);
             return ResponseEntity.status(HttpStatus.OK).body(id);
+        }
+    }
+
+    @DeleteMapping(path= "/comments/{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable("commentId") int commentId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            commentService.deleteComment(commentId);
+            return ResponseEntity.status(HttpStatus.OK).body("success");
         }
     }
 }
