@@ -246,4 +246,15 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.OK).body("success");
         }
     }
+
+    @PatchMapping(path= "/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> editComment(@PathVariable("commentId") int commentId, @RequestBody CommentUpdateRequest commentUpdateRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            commentService.updateCommentContent(commentId, commentUpdateRequest.getNewContent());
+            return ResponseEntity.status(HttpStatus.OK).body("success");
+        }
+    }
 }
