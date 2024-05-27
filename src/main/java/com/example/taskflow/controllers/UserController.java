@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -166,5 +167,28 @@ public class UserController {
             notificationsService.deleteNotification(noticeId);
             return ResponseEntity.status(HttpStatus.OK).body("success");
         }
+    }
+
+    @GetMapping("/login/oauth2/code/google")
+    public LoginResponse googleLogin(OAuth2AuthenticationToken token) {
+        // Lấy thông tin người dùng từ token OAuth2
+        UserDetails userDetails = (UserDetails) token.getPrincipal();
+        String email = userDetails.getUsername();
+
+        // Kiểm tra xem email đã tồn tại trong cơ sở dữ liệu chưa
+        UserDetails existingUser = userService.loadUserByUsername(email);
+
+        if (existingUser == null) {
+            // Nếu email chưa tồn tại, tạo tài khoản mới cho người dùng
+            User user = userService.addUser(email, userDetails.getUsername(), "");
+            existingUser = new CustomUserDetails(user);
+        }
+
+        // Tạo JWT token
+        String jwt = tokenProvider.generateToken((CustomUserDetails) existingUser);
+        int id = ((CustomUserDetails) existingUser).getUser().getId();
+
+        // Trả về token cho người dùng
+        return new LoginResponse(jwt, email, "", id);
     }
 }
