@@ -1,9 +1,6 @@
 package com.example.taskflow.services;
 
-import com.example.taskflow.entities.Comment;
-import com.example.taskflow.entities.EnumState;
-import com.example.taskflow.entities.FileAttachment;
-import com.example.taskflow.entities.Task;
+import com.example.taskflow.entities.*;
 import com.example.taskflow.reponsitories.CommentRepository;
 import com.example.taskflow.reponsitories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +86,12 @@ public class TaskService {
 
     public void deleteTask(int id) {
         taskRepository.deleteById(id);
+    }
+
+    public Task updatePriority(int taskId, EnumPriority enumPriority) {
+        taskRepository.updatePriorityById(taskId, enumPriority);
+        Task task = getTaskById(taskId);
+        return task;
     }
 
 //    public void getCommentByParent(Comment comment) {

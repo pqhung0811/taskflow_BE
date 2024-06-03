@@ -1,5 +1,7 @@
 package com.example.taskflow.dtos;
 
+import com.example.taskflow.entities.EnumCategory;
+import com.example.taskflow.entities.EnumPriority;
 import com.example.taskflow.entities.EnumState;
 import lombok.Data;
 
@@ -13,6 +15,8 @@ public class CreateTaskRequest {
     private int projectId;
     private String deadline;
     private String description;
+    private EnumPriority priority;
+    private EnumCategory category;
 
     public String getTitle() {
         return title;
@@ -60,5 +64,21 @@ public class CreateTaskRequest {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public EnumPriority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(EnumPriority priority) {
+        this.priority = priority;
+    }
+
+    public EnumCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(EnumCategory category) {
+        this.category = category;
     }
 }

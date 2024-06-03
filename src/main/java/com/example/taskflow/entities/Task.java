@@ -21,6 +21,8 @@ public class Task {
     private LocalDateTime startTime;
     private LocalDateTime deadline;
     private String description;
+    private EnumPriority priority;
+    private EnumCategory category;
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
     private List<Breakpoint> breakPoints = new ArrayList<Breakpoint>();
     @ManyToOne
@@ -37,8 +39,9 @@ public class Task {
     public Task() {
     }
 
-    public Task(String title, int advance, LocalDateTime startTime,
-                LocalDateTime deadline, Project project, User responsible, String description) {
+    public Task(String title, int advance, LocalDateTime startTime, LocalDateTime deadline,
+                Project project, User responsible, String description, EnumPriority priority,
+                EnumCategory category) {
         this.title = title;
         this.advance = advance;
         this.state = EnumState.ON_HOLD;
@@ -47,6 +50,8 @@ public class Task {
         this.project = project;
         this.responsible = responsible;
         this.description = description;
+        this.priority = priority;
+        this.category = category;
     }
 
     public void addComment(Comment comment) {

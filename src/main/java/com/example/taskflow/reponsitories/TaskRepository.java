@@ -1,9 +1,6 @@
 package com.example.taskflow.reponsitories;
 
-import com.example.taskflow.entities.Comment;
-import com.example.taskflow.entities.EnumState;
-import com.example.taskflow.entities.FileAttachment;
-import com.example.taskflow.entities.Task;
+import com.example.taskflow.entities.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -44,4 +41,8 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     public List<Comment> findCommentByTaskId(int taskId);
     @Query("SELECT f FROM FileAttachment f WHERE f.task.id = :taskId")
     public List<FileAttachment> findFileByTaskId(int taskId);
+    @Transactional
+    @Modifying
+    @Query("UPDATE Task t SET t.priority = :newPriority WHERE t.id = :taskId")
+    public int updatePriorityById(int taskId, EnumPriority newPriority);
 }

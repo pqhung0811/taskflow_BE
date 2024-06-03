@@ -87,11 +87,17 @@ public class TaskController {
                 }
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                 LocalDateTime startTime = LocalDateTime.now();
-                LocalDateTime deadline = LocalDateTime.parse(createTaskRequest.getDeadline(), formatter);
+                LocalDateTime deadline;
+                if (createTaskRequest.getDeadline() != null) {
+                    deadline = LocalDateTime.parse(createTaskRequest.getDeadline(), formatter);
+                }
+                else {
+                    deadline = null;
+                }
                 Project project = projectOptional.get();
 
                 String textNotify = "You has been assignend to new task with title: " +
-                                        createTaskRequest.getTitle() +
+                                        createTaskRequest.getTitle() + " in project " + project.getName() +
                                         ", deadline " + deadline;
                 notificationsService.createNotification(userDetails.getUser(), textNotify);
                 notificationController.sendNotification(userDetails.getUser().getId(), "a");
@@ -101,7 +107,9 @@ public class TaskController {
                         deadline,
                         project,
                         userDetails.getUser(),
-                        createTaskRequest.getDescription());
+                        createTaskRequest.getDescription(),
+                        createTaskRequest.getPriority(),
+                        createTaskRequest.getCategory());
                 task = taskService.createTask(task);
                 hashMap.put("task", task);
 
@@ -119,8 +127,9 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } else {
             Task task = taskService.updateTitle(modifyTitleTaskRequest.getTaskId(), modifyTitleTaskRequest.getNewTitle());
-            Map<String, Task> hasMap = new HashMap<>();
-            hasMap.put("task", task);
+            Map<String, TaskDto> hasMap = new HashMap<>();
+            TaskDto taskDto = new TaskDto(task);
+            hasMap.put("task", taskDto);
             return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }
@@ -132,8 +141,9 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } else {
             Task task = taskService.updateDescription(modifyDescriptionTaskRequest.getTaskId(), modifyDescriptionTaskRequest.getNewDescription());
-            Map<String, Task> hasMap = new HashMap<>();
-            hasMap.put("task", task);
+            Map<String, TaskDto> hasMap = new HashMap<>();
+            TaskDto taskDto = new TaskDto(task);
+            hasMap.put("task", taskDto);
             return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }
@@ -145,8 +155,9 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } else {
             Task task = taskService.updateAdvance(modifyAdvanceTaskRequest.getTaskId(), modifyAdvanceTaskRequest.getNewAdvance());
-            Map<String, Task> hasMap = new HashMap<>();
-            hasMap.put("task", task);
+            Map<String, TaskDto> hasMap = new HashMap<>();
+            TaskDto taskDto = new TaskDto(task);
+            hasMap.put("task", taskDto);
             return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }
@@ -162,8 +173,9 @@ public class TaskController {
                                 + modifyDeadlineTaskRequest.getNewDeadline();
             notificationsService.createNotification(task.getResponsible(), textNotify);
             notificationController.sendNotification(task.getResponsible().getId(), "a");
-            Map<String, Task> hasMap = new HashMap<>();
-            hasMap.put("task", task);
+            Map<String, TaskDto> hasMap = new HashMap<>();
+            TaskDto taskDto = new TaskDto(task);
+            hasMap.put("task", taskDto);
             return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }
@@ -181,6 +193,24 @@ public class TaskController {
             ProjectsTaskDto projectsTaskDto = new ProjectsTaskDto(task);
             Map<String, ProjectsTaskDto> hasMap = new HashMap<>();
             hasMap.put("task", projectsTaskDto);
+            return ResponseEntity.status(HttpStatus.OK).body(hasMap);
+        }
+    }
+
+    @PatchMapping(path = "/tasks/modifyPriority", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updatePriorityTask(@RequestBody ModifyPriorityTaskRequest modifyPriorityTaskRequest) throws ParseException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            Task task = taskService.updatePriority(modifyPriorityTaskRequest.getTaskId(), modifyPriorityTaskRequest.getNewPriority());
+            String textNotify = "Your task (" + task.getTitle() + ") was updated new priority to "
+                    + modifyPriorityTaskRequest.getNewPriority();
+            notificationsService.createNotification(task.getResponsible(), textNotify);
+            notificationController.sendNotification(task.getResponsible().getId(), "a");
+            Map<String, TaskDto> hasMap = new HashMap<>();
+            TaskDto taskDto = new TaskDto(task);
+            hasMap.put("task", taskDto);
             return ResponseEntity.status(HttpStatus.OK).body(hasMap);
         }
     }

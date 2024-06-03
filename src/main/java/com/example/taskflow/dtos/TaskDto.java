@@ -21,6 +21,8 @@ public class TaskDto {
     private UserDto responsible;
     private ProjectDto project;
     private List<FileAttachmentDto> files;
+    private EnumPriority priority;
+    private EnumCategory category;
 
     public TaskDto(Task task) {
         this.id = task.getId();
@@ -60,5 +62,7 @@ public class TaskDto {
             fileAttachmentDtos.add(fileAttachmentDto);
         }
         this.files = fileAttachmentDtos;
+        this.priority = task.getPriority();
+        this.category = task.getCategory();
     }
 }
