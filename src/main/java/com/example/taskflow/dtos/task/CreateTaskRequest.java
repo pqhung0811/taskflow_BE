@@ -1,4 +1,4 @@
-package com.example.taskflow.dtos;
+package com.example.taskflow.dtos.task;
 
 import com.example.taskflow.entities.EnumCategory;
 import com.example.taskflow.entities.EnumPriority;

@@ -1,8 +1,12 @@
 package com.example.taskflow.controllers;
 
 import com.example.taskflow.dtos.*;
+import com.example.taskflow.dtos.task.*;
+import com.example.taskflow.dtos.commentRequest.*;
+import com.example.taskflow.dtos.project.ProjectsTaskDto;
 import com.example.taskflow.entities.*;
 import com.example.taskflow.services.*;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -186,7 +190,14 @@ public class TaskController {
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         } else {
-            Task task = taskService.updateState(modifyStateTaskRequest.getTaskId(), modifyStateTaskRequest.getNewState());
+            Task task;
+            if (modifyStateTaskRequest.getNewState() != EnumState.VALIDATED) {
+                task = taskService.updateState(modifyStateTaskRequest.getTaskId(), modifyStateTaskRequest.getNewState());
+            }
+            else {
+                LocalDateTime currentDateTime = LocalDateTime.now();
+                task = taskService.updateEndTask(modifyStateTaskRequest.getTaskId(), modifyStateTaskRequest.getNewState(), currentDateTime);
+            }
             String textNotify = "Your task (" + task.getTitle() + ") was updated state";
             notificationsService.createNotification(task.getResponsible(), textNotify);
             notificationController.sendNotification(task.getResponsible().getId(), "a");

@@ -1,4 +1,4 @@
-package com.example.taskflow.dtos;
+package com.example.taskflow.dtos.commentRequest;
 
 public class CommentUpdateRequest {
     private String newContent;

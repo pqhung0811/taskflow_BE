@@ -1,4 +1,4 @@
-package com.example.taskflow.dtos;
+package com.example.taskflow.dtos.commentRequest;
 
 import lombok.Data;
 

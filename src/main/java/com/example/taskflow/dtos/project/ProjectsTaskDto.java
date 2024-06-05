@@ -1,5 +1,6 @@
-package com.example.taskflow.dtos;
+package com.example.taskflow.dtos.project;
 
+import com.example.taskflow.dtos.*;
 import com.example.taskflow.entities.Comment;
 import com.example.taskflow.entities.EnumState;
 import com.example.taskflow.entities.Task;

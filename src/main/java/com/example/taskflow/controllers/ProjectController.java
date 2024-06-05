@@ -1,6 +1,7 @@
 package com.example.taskflow.controllers;
 
 import com.example.taskflow.dtos.*;
+import com.example.taskflow.dtos.project.*;
 import com.example.taskflow.entities.Project;
 import com.example.taskflow.entities.Task;
 import com.example.taskflow.entities.User;

@@ -20,6 +20,7 @@ public class Task {
     private EnumState state;
     private LocalDateTime startTime;
     private LocalDateTime deadline;
+    private LocalDateTime endTime;
     private String description;
     private EnumPriority priority;
     private EnumCategory category;

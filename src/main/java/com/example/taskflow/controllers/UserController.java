@@ -1,6 +1,7 @@
 package com.example.taskflow.controllers;
 
 import com.example.taskflow.dtos.*;
+import com.example.taskflow.dtos.loginAndRegister.*;
 import com.example.taskflow.entities.Notifications;
 import com.example.taskflow.entities.User;
 import com.example.taskflow.securities.JwtTokenProvider;

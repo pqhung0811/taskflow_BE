@@ -94,6 +94,12 @@ public class TaskService {
         return task;
     }
 
+    public Task updateEndTask(int taskId, EnumState enumState, LocalDateTime endTime) {
+        taskRepository.updateEndTimeById(taskId, enumState, endTime);
+        Task task = getTaskById(taskId);
+        return task;
+    }
+
 //    public void getCommentByParent(Comment comment) {
 //        List<Comment> comments = commentRepository.findCommentByParent(comment.getId());
 //        if (comments.size()==0) return;

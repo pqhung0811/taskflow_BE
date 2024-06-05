@@ -1,6 +1,7 @@
 package com.example.taskflow.reponsitories;
 
 import com.example.taskflow.entities.*;
+import org.apache.tomcat.jni.Local;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -45,4 +46,8 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Modifying
     @Query("UPDATE Task t SET t.priority = :newPriority WHERE t.id = :taskId")
     public int updatePriorityById(int taskId, EnumPriority newPriority);
+    @Transactional
+    @Modifying
+    @Query("UPDATE Task t SET t.state = :newState, t.endTime = :newEndTime WHERE t.id = :taskId")
+    public int updateEndTimeById(int taskId, EnumState newState, LocalDateTime newEndTime);
 }
