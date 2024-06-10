@@ -16,7 +16,6 @@ public class TaskDto {
     private LocalDateTime startTime;
     private LocalDateTime deadline;
     private String description;
-//    private List<Breakpoint> breakPoints = new ArrayList<Breakpoint>();
     private List<CommentDto> comments;
     private UserDto responsible;
     private ProjectDto project;
@@ -43,11 +42,13 @@ public class TaskDto {
             commentDtos1.add(commentDto);
         }
         this.comments = commentDtos1;
-        UserDto userDto = new UserDto();
-        userDto.setId(task.getResponsible().getId());
-        userDto.setEmail(task.getResponsible().getEmail());
-        userDto.setName(task.getResponsible().getName());
-        this.responsible = userDto;
+        if (task.getResponsible()!=null) {
+            UserDto userDto = new UserDto();
+            userDto.setId(task.getResponsible().getId());
+            userDto.setEmail(task.getResponsible().getEmail());
+            userDto.setName(task.getResponsible().getName());
+            this.responsible = userDto;
+        }
         ProjectDto projectDto = new ProjectDto();
         projectDto.setId(task.getProject().getId());
         projectDto.setName(task.getProject().getName());

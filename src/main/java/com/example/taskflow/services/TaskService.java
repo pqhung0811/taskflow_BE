@@ -100,6 +100,12 @@ public class TaskService {
         return task;
     }
 
+    public Task reassignTask(int taskId, int userId) {
+        taskRepository.updateResponsible(userId, taskId);
+        Task task = getTaskById(taskId);
+        return task;
+    }
+
 //    public void getCommentByParent(Comment comment) {
 //        List<Comment> comments = commentRepository.findCommentByParent(comment.getId());
 //        if (comments.size()==0) return;

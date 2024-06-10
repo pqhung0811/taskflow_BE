@@ -170,6 +170,21 @@ public class UserController {
         }
     }
 
+    @PatchMapping("/changepassword")
+    public ResponseEntity<?> deleteNotify(@RequestBody ChangePasswordRequest changePasswordRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = customUserDetails.getUser();
+        if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not same password");
+        }
+        userService.updatePassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()), user);
+        return ResponseEntity.status(HttpStatus.OK).body("OK");
+    }
+
     @GetMapping("/login/oauth2/code/google")
     public LoginResponse googleLogin(OAuth2AuthenticationToken token) {
         // Lấy thông tin người dùng từ token OAuth2

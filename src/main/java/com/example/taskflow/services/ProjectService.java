@@ -1,8 +1,10 @@
 package com.example.taskflow.services;
 
 import com.example.taskflow.entities.Project;
+import com.example.taskflow.entities.Task;
 import com.example.taskflow.entities.User;
 import com.example.taskflow.reponsitories.ProjectRepository;
+import com.example.taskflow.reponsitories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import java.util.Optional;
 public class ProjectService {
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private TaskRepository taskRepository;
 
     public List<Project> getProjectsByUserId(int userId) {
         return projectRepository.getProjectByUserId(userId);
@@ -52,6 +56,18 @@ public class ProjectService {
         project.setProjectManager(user);
         projectRepository.save(project);
         addMemberToProject(user, project);
+        return project;
+    }
+    public Project removeMember(int userId, Project project) {
+        List<User> users = project.getMembers();
+        taskRepository.setResponsibleToNullByUserId(userId, project.getId());
+        for (User user : users) {
+            if (userId==user.getId()) {
+                users.remove(user);
+                break;
+            }
+        }
+        projectRepository.save(project);
         return project;
     }
 }

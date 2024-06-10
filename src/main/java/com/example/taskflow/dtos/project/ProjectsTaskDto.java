@@ -30,11 +30,13 @@ public class ProjectsTaskDto {
         this.startTime = task.getStartTime();
         this.deadline = task.getDeadline();
         this.description = task.getDescription();
-        UserDto userDto = new UserDto();
-        userDto.setId(task.getResponsible().getId());
-        userDto.setEmail(task.getResponsible().getEmail());
-        userDto.setName(task.getResponsible().getName());
-        this.responsible = userDto;
+        if (task.getResponsible()!=null) {
+            UserDto userDto = new UserDto();
+            userDto.setId(task.getResponsible().getId());
+            userDto.setEmail(task.getResponsible().getEmail());
+            userDto.setName(task.getResponsible().getName());
+            this.responsible = userDto;
+        }
         ProjectDto projectDto = new ProjectDto();
         projectDto.setId(task.getProject().getId());
         projectDto.setName(task.getProject().getName());

@@ -45,12 +45,14 @@ public class StatisticsController {
             LocalDateTime currentDateTime = LocalDateTime.now();
             List<Integer> recentWeeks = getRecentWeeks();
             for (Task t : tasks) {
-                initMapping(t, statisticsDtoMap, weeklyCompletionTimesMap,
+                if (t.getResponsible() == null) continue;
+                String email = t.getResponsible().getEmail();
+                initMapping(email, statisticsDtoMap, weeklyCompletionTimesMap,
                         completedTasksPerWeekMap, receivedTasksPerWeekMap);
-                StatisticsDto statisticsDto = statisticsDtoMap.get(t.getResponsible().getEmail());
-                Map<Integer, List<Long>> weeklyCompletionTimes = weeklyCompletionTimesMap.get(t.getResponsible().getEmail());
-                Map<Integer, Integer> completedTasksPerWeek = completedTasksPerWeekMap.get(t.getResponsible().getEmail());
-                Map<Integer, Integer> receivedTasksPerWeek = receivedTasksPerWeekMap.get(t.getResponsible().getEmail());
+                StatisticsDto statisticsDto = statisticsDtoMap.get(email);
+                Map<Integer, List<Long>> weeklyCompletionTimes = weeklyCompletionTimesMap.get(email);
+                Map<Integer, Integer> completedTasksPerWeek = completedTasksPerWeekMap.get(email);
+                Map<Integer, Integer> receivedTasksPerWeek = receivedTasksPerWeekMap.get(email);
                 statisticsDto.addPriority(t.getPriority());
                 statisticsDto.addCategory(t.getCategory());
                 LocalDateTime deadline = t.getDeadline();
@@ -89,26 +91,26 @@ public class StatisticsController {
         return ResponseEntity.status(HttpStatus.OK).body(statisticsDtoMap);
     }
 
-    public void initMapping(Task t, Map<String, StatisticsDto> statisticsDtoMap,
+    public void initMapping(String email, Map<String, StatisticsDto> statisticsDtoMap,
                             Map<String, Map<Integer, List<Long>>> weeklyCompletionTimesMap,
                             Map<String, Map<Integer, Integer>> completedTasksPerWeekMap,
                             Map<String, Map<Integer, Integer>> receivedTasksPerWeekMap)
     {
-        if (!statisticsDtoMap.containsKey(t.getResponsible().getEmail())) {
+        if (!statisticsDtoMap.containsKey(email)) {
             StatisticsDto statisticsDto = new StatisticsDto();
-            statisticsDtoMap.put(t.getResponsible().getEmail(), statisticsDto);
+            statisticsDtoMap.put(email, statisticsDto);
         }
-        if (!weeklyCompletionTimesMap.containsKey(t.getResponsible().getEmail())) {
+        if (!weeklyCompletionTimesMap.containsKey(email)) {
             Map<Integer, List<Long>> weeklyCompletionTimes = new HashMap<>();
-            weeklyCompletionTimesMap.put(t.getResponsible().getEmail(), weeklyCompletionTimes);
+            weeklyCompletionTimesMap.put(email, weeklyCompletionTimes);
         }
-        if (!completedTasksPerWeekMap.containsKey(t.getResponsible().getEmail())) {
+        if (!completedTasksPerWeekMap.containsKey(email)) {
             Map<Integer, Integer> completedTasksPerWeek = new HashMap<>();
-            completedTasksPerWeekMap.put(t.getResponsible().getEmail(), completedTasksPerWeek);
+            completedTasksPerWeekMap.put(email, completedTasksPerWeek);
         }
-        if (!receivedTasksPerWeekMap.containsKey(t.getResponsible().getEmail())) {
+        if (!receivedTasksPerWeekMap.containsKey(email)) {
             Map<Integer, Integer> receivedTasksPerWeek = new HashMap<>();
-            receivedTasksPerWeekMap.put(t.getResponsible().getEmail(), receivedTasksPerWeek);
+            receivedTasksPerWeekMap.put(email, receivedTasksPerWeek);
         }
     }
 

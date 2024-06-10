@@ -226,6 +226,25 @@ public class TaskController {
         }
     }
 
+    @PatchMapping(path = "/tasks/modifyResponsible", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updatePriorityTask(@RequestBody ReassignRequest reassignRequest) throws ParseException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            Task task = taskService.reassignTask(reassignRequest.getTaskId(), reassignRequest.getUserId());
+            String textNotify = "You has been assignend to new task with title: " +
+                    task.getTitle() + " in project " + task.getProject().getName() +
+                    ", deadline " + task.getDeadline();
+            notificationsService.createNotification(task.getResponsible(), textNotify);
+            notificationController.sendNotification(task.getResponsible().getId(), "a");
+            Map<String, TaskDto> hasMap = new HashMap<>();
+            TaskDto taskDto = new TaskDto(task);
+            hasMap.put("task", taskDto);
+            return ResponseEntity.status(HttpStatus.OK).body(hasMap);
+        }
+    }
+
     @PostMapping(path = "/tasks/comment", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> commentTask(@RequestBody CommentRequest commentRequest) throws ParseException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

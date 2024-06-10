@@ -148,4 +148,25 @@ public class ProjectController {
         return ResponseEntity.status((HttpStatus.OK)).body("Delete project successfully");
     }
 
+    @PatchMapping(path= "/projects/deleteMember")
+    public ResponseEntity removeMember(@RequestBody DeleteMemberRequest deleteMemberRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        Optional<Project> projectOptional = projectService.getProjectById(deleteMemberRequest.getProjectId());
+        Project project = projectOptional.get();
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        if (customUserDetails.getUser().getId() != project.getProjectManager().getId()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Not PM");
+        }
+        projectService.removeMember(deleteMemberRequest.getUserId(), project);
+        String textNotify = "You are removed to project (" + project.getName() + ")";
+        User user = userService.getUserById(deleteMemberRequest.getUserId());
+        notificationsService.createNotification(user, textNotify);
+        notificationController.sendNotification(user.getId(), "a");
+        ProjectDto projectDto = new ProjectDto(project);
+        return ResponseEntity.status(HttpStatus.OK).body(projectDto);
+    }
+
 }

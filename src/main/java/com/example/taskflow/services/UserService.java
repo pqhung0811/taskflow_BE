@@ -62,4 +62,9 @@ public class UserService implements UserDetailsService {
     public void updateNameById(String name, int userId) {
         userRepository.updateNameById(name, userId);
     }
+
+    public void updatePassword(String password, User user) {
+        user.setPassword(password);
+        userRepository.save(user);
+    }
 }

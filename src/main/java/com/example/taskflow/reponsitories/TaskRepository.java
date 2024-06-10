@@ -50,4 +50,12 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Modifying
     @Query("UPDATE Task t SET t.state = :newState, t.endTime = :newEndTime WHERE t.id = :taskId")
     public int updateEndTimeById(int taskId, EnumState newState, LocalDateTime newEndTime);
+    @Modifying
+    @Transactional
+    @Query("UPDATE Task t SET t.responsible = NULL WHERE t.responsible.id = :userId AND t.project.id = :projectId")
+    public void setResponsibleToNullByUserId(int userId, int projectId);
+    @Modifying
+    @Transactional
+    @Query("UPDATE Task t SET t.responsible.id = :userId WHERE t.id = :taskId")
+    public void updateResponsible(int userId, int taskId);
 }

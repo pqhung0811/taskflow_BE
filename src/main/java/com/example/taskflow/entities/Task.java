@@ -24,8 +24,6 @@ public class Task {
     private String description;
     private EnumPriority priority;
     private EnumCategory category;
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
-    private List<Breakpoint> breakPoints = new ArrayList<Breakpoint>();
     @ManyToOne
     @JoinColumn(name = "project_id")
     private Project project;
