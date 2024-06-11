@@ -5,7 +5,6 @@ import com.example.taskflow.entities.User;
 import com.example.taskflow.services.CustomUserDetails;
 import com.example.taskflow.services.ImageDataService;
 import com.example.taskflow.services.UserService;
-import com.example.taskflow.utils.ImageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

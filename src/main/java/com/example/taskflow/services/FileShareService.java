@@ -1,5 +1,6 @@
 package com.example.taskflow.services;
 
+import com.example.taskflow.entities.FileAttachment;
 import com.example.taskflow.entities.FileShare;
 import com.example.taskflow.entities.Folder;
 import com.example.taskflow.entities.Project;
@@ -114,7 +115,40 @@ public class FileShareService {
         return folderOptional.get();
     }
 
-    public Folder saveFolder(String folderName, Project project, String parentPath) {
-        return null;
+    public Folder saveFolder(String folderName, Project project) {
+        Folder folder = new Folder();
+        folder.setName(folderName);
+        folder.setProject(project);
+        folderRepository.save(folder);
+        return folder;
+    }
+
+    public Folder saveFolder(String folderName, Folder parentFolder) {
+        Folder folder = new Folder();
+        folder.setName(folderName);
+        folder.setParentFolder(parentFolder);
+        folderRepository.save(folder);
+        return folder;
+    }
+
+    public void deleteFile(FileShare fileShare) {
+        File file = new File(parentPath + fileShare.getFilePath());
+
+        if (file.exists()) {
+            file.delete();
+        }
+        fileShareRepository.delete(fileShare);
+    }
+
+    public void deleteFolder(Folder parentFolder) {
+        List<Folder> folders = parentFolder.getSubFolders();
+        for (Folder folder : folders) {
+            deleteFolder(folder);
+        }
+        List<FileShare> fileShares = parentFolder.getFiles();
+        for (FileShare fileShare : fileShares) {
+            deleteFile(fileShare);
+        }
+        folderRepository.delete(parentFolder);
     }
 }

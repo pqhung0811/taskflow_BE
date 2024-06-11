@@ -3,8 +3,8 @@ package com.example.taskflow.controllers;
 import com.example.taskflow.dtos.FileShareDto;
 import com.example.taskflow.dtos.FolderDto;
 import com.example.taskflow.dtos.ProjectFileDto;
+import com.example.taskflow.dtos.SubFolderDto;
 import com.example.taskflow.dtos.fileshare.FolderRequest;
-import com.example.taskflow.entities.FileAttachment;
 import com.example.taskflow.entities.FileShare;
 import com.example.taskflow.entities.Folder;
 import com.example.taskflow.entities.Project;
@@ -78,17 +78,17 @@ public class FileShareController {
             Project project = projectOptional.get();
             List<FileShare> fileShares = fileShareService.getFileSharesByProject(project);
             List<Folder> folders = fileShareService.getFolderByProject(project);
-            List<FolderDto> folderDtos = new ArrayList<>();
+            List<SubFolderDto> subFolderDtos = new ArrayList<>();
             List<FileShareDto> fileShareDtos = new ArrayList<>();
             for (FileShare fileShare : fileShares) {
                 FileShareDto fileShareDto = new FileShareDto(fileShare);
                 fileShareDtos.add(fileShareDto);
             }
             for (Folder folder : folders) {
-                FolderDto folderDto = new FolderDto(folder);
-                folderDtos.add(folderDto);
+                SubFolderDto subFolderDto = new SubFolderDto(folder);
+                subFolderDtos.add(subFolderDto);
             }
-            ProjectFileDto projectFileDto = new ProjectFileDto(folderDtos, fileShareDtos);
+            ProjectFileDto projectFileDto = new ProjectFileDto(subFolderDtos, fileShareDtos);
             return ResponseEntity.status(HttpStatus.OK).body(projectFileDto);
         }
     }
@@ -132,17 +132,83 @@ public class FileShareController {
                 .body(resource);
     }
 
-//    @PostMapping(path = "/project/addFolder")
-//    public ResponseEntity<?> addFolder(@RequestBody FolderRequest folderRequest) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-//        } else {
-//            if (folderRequest.getProjectId()<=0) {
-//
-//            }
-//
-//        }
-//    }
+    @GetMapping(path = "/folder/back/{folderId}")
+    public ResponseEntity<?> getFolderBack(@PathVariable int folderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            Folder folder = fileShareService.getFolderById(folderId);
+            if (folder.getParentFolder()==null) {
+                Project project = folder.getProject();
+                List<FileShare> fileShares = fileShareService.getFileSharesByProject(project);
+                List<Folder> folders = fileShareService.getFolderByProject(project);
+                List<SubFolderDto> folderDtos = new ArrayList<>();
+                List<FileShareDto> fileShareDtos = new ArrayList<>();
+                for (FileShare fileShare : fileShares) {
+                    FileShareDto fileShareDto = new FileShareDto(fileShare);
+                    fileShareDtos.add(fileShareDto);
+                }
+                for (Folder folder1 : folders) {
+                    SubFolderDto folderDto = new SubFolderDto(folder1);
+                    folderDtos.add(folderDto);
+                }
+                ProjectFileDto projectFileDto = new ProjectFileDto(folderDtos, fileShareDtos);
+                return ResponseEntity.status(HttpStatus.OK).body(projectFileDto);
+            }
+            else {
+                Folder parentFolder = folder.getParentFolder();
+                FolderDto folderDto = new FolderDto(parentFolder);
+                return ResponseEntity.status(HttpStatus.OK).body(folderDto);
+            }
+        }
+    }
 
+    @PostMapping(path = "/folder/addFolder")
+    public ResponseEntity<?> addFolder(@RequestBody FolderRequest folderRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            if (folderRequest.getParentId()==0) {
+                Optional<Project> projectOptional = projectService.getProjectById(folderRequest.getProjectId());
+                Project project = projectOptional.get();
+                Folder folder = fileShareService.saveFolder(folderRequest.getFolderName(), project);
+                FolderDto folderDto = new FolderDto(folder);
+                return ResponseEntity.status(HttpStatus.OK).body(folderDto);
+            } else if (folderRequest.getProjectId()==0) {
+                Folder parentFolder = fileShareService.getFolderById(folderRequest.getParentId());
+                Folder folder = fileShareService.saveFolder(folderRequest.getFolderName(), parentFolder);
+                SubFolderDto folderDto = new SubFolderDto(folder);
+                return ResponseEntity.status(HttpStatus.OK).body(folderDto);
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            }
+        }
+    }
+
+    @DeleteMapping("/fileShare/{id}")
+    public ResponseEntity<?> deleteFile(@PathVariable int id) throws IOException {
+        FileShare fileShare = fileShareService.getFileById(id);
+
+        if (fileShare == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
+        }
+        FileShareDto fileShareDto = new FileShareDto(fileShare);
+        fileShareService.deleteFile(fileShare);
+        return ResponseEntity.status(HttpStatus.OK).body(fileShareDto);
+    }
+
+    @DeleteMapping("/folder/{id}")
+    public ResponseEntity<?> deleteFolder(@PathVariable int id) throws IOException {
+        Folder folder = fileShareService.getFolderById(id);
+
+        if (folder == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("file not found");
+        }
+        SubFolderDto subFolderDto = new SubFolderDto(folder);
+        fileShareService.deleteFolder(folder);
+        return ResponseEntity.status(HttpStatus.OK).body(subFolderDto);
+    }
 }
