@@ -17,7 +17,6 @@ public class StatisticsDto {
     private Map<Integer, Integer> completedTasksPerWeek;
     private Map<Integer, Integer> receivedTasksPerWeek;
 
-
     public StatisticsDto() {
         priority = new HashMap<>();
         category = new HashMap<>();

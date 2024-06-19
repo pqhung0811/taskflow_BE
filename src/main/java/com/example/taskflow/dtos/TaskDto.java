@@ -22,6 +22,7 @@ public class TaskDto {
     private List<FileAttachmentDto> files;
     private EnumPriority priority;
     private EnumCategory category;
+    private int estimateTime;
 
     public TaskDto(Task task) {
         this.id = task.getId();
@@ -65,5 +66,6 @@ public class TaskDto {
         this.files = fileAttachmentDtos;
         this.priority = task.getPriority();
         this.category = task.getCategory();
+        this.estimateTime = task.getEstimateTime();
     }
 }

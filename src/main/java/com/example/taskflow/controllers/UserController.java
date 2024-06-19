@@ -2,10 +2,12 @@ package com.example.taskflow.controllers;
 
 import com.example.taskflow.dtos.*;
 import com.example.taskflow.dtos.loginAndRegister.*;
+import com.example.taskflow.entities.ImageData;
 import com.example.taskflow.entities.Notifications;
 import com.example.taskflow.entities.User;
 import com.example.taskflow.securities.JwtTokenProvider;
 import com.example.taskflow.services.CustomUserDetails;
+import com.example.taskflow.services.ImageDataService;
 import com.example.taskflow.services.NotificationsService;
 import com.example.taskflow.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +44,8 @@ public class UserController {
     private JwtTokenProvider tokenProvider;
     @Autowired
     private NotificationsService notificationsService;
+    @Autowired
+    private ImageDataService imageDataService;
 
     @GetMapping(path = "/user/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public User getUserById(@PathVariable Integer id){
@@ -206,5 +213,35 @@ public class UserController {
 
         // Trả về token cho người dùng
         return new LoginResponse(jwt, email, "", id);
+    }
+
+    @PostMapping(path = "/image")
+    public ResponseEntity<?> uploadImage(@RequestParam("image") MultipartFile file) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        else {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            String response = imageDataService.uploadImage(file, userDetails.getUser());
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(response);
+        }
+    }
+
+    @GetMapping(path = "/image/info/{userId}")
+    public void getImageInfoByUserId(@PathVariable("userId") int userId, HttpServletResponse response) {
+        User user = userService.getUserById(userId);
+        ImageData imageData = imageDataService.getImageByUser(user);
+        byte[] image = imageData.getImageData();
+
+        response.setContentType("image/jpeg");
+        response.setHeader("Content-Length", String.valueOf(imageData.getImageData().length));
+        try {
+            response.getOutputStream().write(image);
+            response.getOutputStream().flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

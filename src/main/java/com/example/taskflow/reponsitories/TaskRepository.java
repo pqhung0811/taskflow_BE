@@ -58,4 +58,8 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     @Transactional
     @Query("UPDATE Task t SET t.responsible.id = :userId WHERE t.id = :taskId")
     public void updateResponsible(int userId, int taskId);
+    @Transactional
+    @Modifying
+    @Query("UPDATE Task t SET t.estimateTime = :estimateTime WHERE t.id = :taskId")
+    public int updateEstimateTimeById(int taskId, int estimateTime);
 }

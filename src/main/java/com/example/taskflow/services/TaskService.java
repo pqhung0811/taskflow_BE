@@ -1,7 +1,6 @@
 package com.example.taskflow.services;
 
 import com.example.taskflow.entities.*;
-import com.example.taskflow.reponsitories.CommentRepository;
 import com.example.taskflow.reponsitories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,8 +17,6 @@ import java.util.Optional;
 public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
-    @Autowired
-    private CommentRepository commentRepository;
 
     public List<Task> getTasksByProjectId(int projectId) {
         List<Task> tasks = taskRepository.findByProjectId(projectId);
@@ -102,6 +99,12 @@ public class TaskService {
 
     public Task reassignTask(int taskId, int userId) {
         taskRepository.updateResponsible(userId, taskId);
+        Task task = getTaskById(taskId);
+        return task;
+    }
+
+    public Task updateEstimateTime(int taskId, int estimateTime) {
+        taskRepository.updateEstimateTimeById(taskId, estimateTime);
         Task task = getTaskById(taskId);
         return task;
     }

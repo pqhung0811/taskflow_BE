@@ -245,6 +245,20 @@ public class TaskController {
         }
     }
 
+    @PatchMapping(path = "/tasks/modifyEstimateTime", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateTitleTask(@RequestBody ModifyEstimateTimeRequest modifyEstimateTimeRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else {
+            Task task = taskService.updateEstimateTime(modifyEstimateTimeRequest.getTaskId(), modifyEstimateTimeRequest.getEstimateTime());
+            Map<String, TaskDto> hasMap = new HashMap<>();
+            TaskDto taskDto = new TaskDto(task);
+            hasMap.put("task", taskDto);
+            return ResponseEntity.status(HttpStatus.OK).body(hasMap);
+        }
+    }
+
     @PostMapping(path = "/tasks/comment", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> commentTask(@RequestBody CommentRequest commentRequest) throws ParseException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

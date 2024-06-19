@@ -3,9 +3,7 @@ package com.example.taskflow.services;
 import com.example.taskflow.entities.FileAttachment;
 import com.example.taskflow.entities.Task;
 import com.example.taskflow.reponsitories.FileAttachmentRepository;
-import com.example.taskflow.reponsitories.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -23,8 +21,6 @@ import java.util.Optional;
 public class FileAttachmentService {
     @Autowired
     private FileAttachmentRepository fileAttachmentRepository;
-    @Autowired
-    private TaskRepository taskRepository;
 
     public FileAttachment saveFile(MultipartFile file, Task task) {
         String fileName = file.getOriginalFilename();

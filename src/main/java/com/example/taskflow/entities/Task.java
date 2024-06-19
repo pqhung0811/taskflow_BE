@@ -34,6 +34,7 @@ public class Task {
     private User responsible;
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
     private List<FileAttachment> fileAttachments = new ArrayList<FileAttachment>();
+    private int estimateTime;
 
     public Task() {
     }

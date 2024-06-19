@@ -1,5 +1,6 @@
 package com.example.taskflow.entities;
 
 public enum EnumPriority {
-    LOW, MEDIUM, HIGH
+    HIGH, MEDIUM, LOW
+//    LOW, MEDIUM, HIGH
 }
