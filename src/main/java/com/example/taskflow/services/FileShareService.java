@@ -6,6 +6,7 @@ import com.example.taskflow.entities.Folder;
 import com.example.taskflow.entities.Project;
 import com.example.taskflow.reponsitories.FileShareRepository;
 import com.example.taskflow.reponsitories.FolderRepository;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.core.io.Resource;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,16 +34,19 @@ public class FileShareService {
 
     public FileShare saveFileToFolder(MultipartFile multipartFile, int folderId, int projectId, String folderPath) {
         String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        long fileSize = multipartFile.getSize();
         Optional<Folder> optionalFolder = folderRepository.findById(folderId);
         if (optionalFolder.isPresent()) {
             Folder folder = optionalFolder.get();
-
+            LocalDateTime updateTime = LocalDateTime.now();
+            folder.setUpdateTime(updateTime);
             FileShare fileShare = new FileShare();
             fileShare.setFileName(fileName);
             String directoryPath = parentPath + projectId + "/" + folderPath;
             fileShare.setFilePath(projectId + "/" + folderPath + fileName);
             fileShare.setFolder(folder);
-
+            fileShare.setUpdateTime(updateTime);
+            fileShare.setSize(fileSize);
             try {
                 File directory = new File(directoryPath);
                 if (!directory.exists()) {
@@ -63,6 +68,8 @@ public class FileShareService {
         String fileName = multipartFile.getOriginalFilename();
         String directoryPath = parentPath + project.getId() + "/";
         String filePath = directoryPath + fileName;
+        LocalDateTime updateTime = LocalDateTime.now();
+        long fileSize = multipartFile.getSize();
         try {
             File directory = new File(directoryPath);
             if (!directory.exists()) {
@@ -77,6 +84,8 @@ public class FileShareService {
         fileShare.setFileName(fileName);
         fileShare.setFilePath(project.getId() + "/" + fileName);
         fileShare.setProject(project);
+        fileShare.setUpdateTime(updateTime);
+        fileShare.setSize(fileSize);
         fileShareRepository.save(fileShare);
 
         return fileShare;
@@ -119,6 +128,8 @@ public class FileShareService {
         Folder folder = new Folder();
         folder.setName(folderName);
         folder.setProject(project);
+        LocalDateTime updateTime = LocalDateTime.now();
+        folder.setUpdateTime(updateTime);
         folderRepository.save(folder);
         return folder;
     }
@@ -127,6 +138,8 @@ public class FileShareService {
         Folder folder = new Folder();
         folder.setName(folderName);
         folder.setParentFolder(parentFolder);
+        LocalDateTime updateTime = LocalDateTime.now();
+        folder.setUpdateTime(updateTime);
         folderRepository.save(folder);
         return folder;
     }

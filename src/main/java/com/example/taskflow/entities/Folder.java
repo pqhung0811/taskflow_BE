@@ -3,6 +3,7 @@ package com.example.taskflow.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +20,7 @@ public class Folder  {
     private Folder parentFolder;
     @ManyToOne
     private Project project;
+    private LocalDateTime updateTime;
     @OneToMany(mappedBy = "parentFolder", cascade = CascadeType.ALL)
     private List<Folder> subFolders = new ArrayList<>();
     @OneToMany(mappedBy = "folder", cascade = CascadeType.ALL)
