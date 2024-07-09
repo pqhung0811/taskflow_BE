@@ -24,8 +24,10 @@ public class FileAttachmentService {
 
     public FileAttachment saveFile(MultipartFile file, Task task) {
         String fileName = file.getOriginalFilename();
-        String directoryPath = "D:/New folder/taskflow/file_folder/task" + task.getId() + "/";
-        String filePath = directoryPath + fileName;
+        Path currentPath = Paths.get("").toAbsolutePath();
+        String relativePath = Paths.get("file_folder", "task" + task.getId()).toString();
+        String directoryPath = currentPath.resolve(relativePath).toString();
+        String filePath = Paths.get(directoryPath, fileName).toString();
         try {
             File directory = new File(directoryPath);
             if (!directory.exists()) {

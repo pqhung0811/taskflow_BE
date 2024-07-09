@@ -192,11 +192,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body("OK");
     }
 
-    @GetMapping("/login/oauth2/code/google")
+    @PostMapping("/login/oauth2/google")
     public LoginResponse googleLogin(OAuth2AuthenticationToken token) {
         // Lấy thông tin người dùng từ token OAuth2
         UserDetails userDetails = (UserDetails) token.getPrincipal();
         String email = userDetails.getUsername();
+        System.out.println("lmao email");
 
         // Kiểm tra xem email đã tồn tại trong cơ sở dữ liệu chưa
         UserDetails existingUser = userService.loadUserByUsername(email);

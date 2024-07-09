@@ -42,8 +42,13 @@ public class FileShareService {
             folder.setUpdateTime(updateTime);
             FileShare fileShare = new FileShare();
             fileShare.setFileName(fileName);
-            String directoryPath = parentPath + projectId + "/" + folderPath;
-            fileShare.setFilePath(projectId + "/" + folderPath + fileName);
+            Path currentPath = Paths.get("").toAbsolutePath();
+            String relativePath = Paths.get("file_share", String.valueOf(projectId), folderPath).toString();
+            String directoryPath = currentPath.resolve(relativePath).toString();
+            String filePath = Paths.get(directoryPath, fileName).toString();
+//            String directoryPath = parentPath + projectId + "/" + folderPath;
+//            fileShare.setFilePath(projectId + "/" + folderPath + fileName);
+            fileShare.setFilePath(filePath);
             fileShare.setFolder(folder);
             fileShare.setUpdateTime(updateTime);
             fileShare.setSize(fileSize);
@@ -52,7 +57,7 @@ public class FileShareService {
                 if (!directory.exists()) {
                     directory.mkdirs(); // Tạo thư mục nếu chưa tồn tại
                 }
-                multipartFile.transferTo(new File(parentPath + fileShare.getFilePath()));
+                multipartFile.transferTo(new File(filePath));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -66,8 +71,12 @@ public class FileShareService {
 
     public FileShare saveFileToProject(MultipartFile multipartFile, Project project) {
         String fileName = multipartFile.getOriginalFilename();
-        String directoryPath = parentPath + project.getId() + "/";
-        String filePath = directoryPath + fileName;
+        Path currentPath = Paths.get("").toAbsolutePath();
+        String relativePath = Paths.get("file_share", String.valueOf(project.getId())).toString();
+        String directoryPath = currentPath.resolve(relativePath).toString();
+        String filePath = Paths.get(directoryPath, fileName).toString();
+//        String directoryPath = parentPath + project.getId() + "/";
+//        String filePath = directoryPath + fileName;
         LocalDateTime updateTime = LocalDateTime.now();
         long fileSize = multipartFile.getSize();
         try {
@@ -82,7 +91,7 @@ public class FileShareService {
 
         FileShare fileShare = new FileShare();
         fileShare.setFileName(fileName);
-        fileShare.setFilePath(project.getId() + "/" + fileName);
+        fileShare.setFilePath(filePath);
         fileShare.setProject(project);
         fileShare.setUpdateTime(updateTime);
         fileShare.setSize(fileSize);
@@ -145,7 +154,7 @@ public class FileShareService {
     }
 
     public void deleteFile(FileShare fileShare) {
-        File file = new File(parentPath + fileShare.getFilePath());
+        File file = new File(fileShare.getFilePath());
 
         if (file.exists()) {
             file.delete();

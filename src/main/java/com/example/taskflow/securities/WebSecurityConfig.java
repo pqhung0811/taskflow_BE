@@ -59,10 +59,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors().configurationSource(corsConfigurationSource())
                 .and()
                 .csrf().disable().authorizeRequests()
-                .antMatchers("/api/v1/login", "/api/v1/users", "/ws/**").permitAll()
+                .antMatchers("/api/v1/login", "/api/v1/users", "/ws/**", "/api/v1/login/oauth2/google").permitAll()
                 .anyRequest().authenticated() // Tất cả các request khác đều cần phải xác thực mới được truy cập
                 .and()
-                .headers().frameOptions().disable();
+                .headers().frameOptions().disable()
+                .addHeaderWriter((request, response) -> {
+                    response.addHeader("Cross-Origin-Opener-Policy", "same-origin");
+                    response.addHeader("Cross-Origin-Embedder-Policy", "require-corp");
+                });
         // Thêm một lớp Filter kiểm tra jwt
          http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
@@ -73,6 +77,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Cho phép tất cả các domain
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH")); // Cho phép các phương thức HTTP
         configuration.setAllowedHeaders(Arrays.asList("*")); // Cho phép tất cả các loại header
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

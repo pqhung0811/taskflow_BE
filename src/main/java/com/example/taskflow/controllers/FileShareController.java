@@ -118,8 +118,7 @@ public class FileShareController {
         // Tạo Resource từ đường dẫn file
         Resource resource;
         try {
-            String parentPath = "D:/New folder/taskflow/file_share/";
-            resource = fileShareService.loadFileAsResource(parentPath + fileShare.getFilePath());
+            resource = fileShareService.loadFileAsResource(fileShare.getFilePath());
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
